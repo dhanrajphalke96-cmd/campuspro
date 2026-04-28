@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+{% block title %}Marks Entry — College ERP{% endblock %}
+{% block page_title %}Enter Marks — {{ exam.name }}{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-pen me-2 text-accent-blue"></i>{{ exam.subject.name }} ({{ exam.total_marks }} marks)</h5>
+        <form method="post">
+            {% csrf_token %}
+            <div class="table-responsive">
+                <table class="erp-table">
+                    <thead><tr><th>Enrollment</th><th>Name</th><th>Marks</th><th>Absent</th></tr></thead>
+                    <tbody>
+                        {% for s in students %}
+                        <tr>
+                            <td style="font-weight:600;color:var(--accent-blue);">{{ s.enrollment_no }}</td>
+                            <td>{{ s.user.get_full_name }}</td>
+                            <td><input type="number" name="marks_{{ s.pk }}" class="form-control" style="max-width:100px;" max="{{ exam.total_marks }}" min="0" step="0.5"></td>
+                            <td><input type="checkbox" name="absent_{{ s.pk }}" value="1"></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn-success-erp"><i class="fas fa-save"></i> Save Marks</button>
+                <a href="{% url 'exam_detail' exam.pk %}" class="btn-outline-erp ms-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

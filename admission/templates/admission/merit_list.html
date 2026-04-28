@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% block title %}Merit Lists — College ERP{% endblock %}
+{% block page_title %}Merit Lists{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-trophy me-2 text-accent-orange"></i>Generated Merit Lists</h5>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Course</th><th>Academic Year</th><th>Cutoff</th><th>Published</th><th>Generated</th></tr></thead>
+                <tbody>
+                    {% for ml in merit_lists %}
+                    <tr>
+                        <td style="font-weight:500;color:var(--text-primary);">{{ ml.course.name }}</td>
+                        <td>{{ ml.academic_year.label }}</td>
+                        <td>{{ ml.cutoff_marks|default:"—" }}</td>
+                        <td><span class="badge-status {% if ml.is_published %}active{% else %}pending{% endif %}">{% if ml.is_published %}Yes{% else %}No{% endif %}</span></td>
+                        <td>{{ ml.generated_at|date:"d M Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center" style="padding:24px;color:var(--text-muted);">No merit lists generated</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

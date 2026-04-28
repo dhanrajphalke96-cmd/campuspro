@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+{% block title %}Fees Management — College ERP{% endblock %}
+{% block page_title %}Fees Management{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card green"><div class="stat-icon green"><i class="fas fa-rupee-sign"></i></div>
+                <div class="stat-info"><h3>₹{{ total_collected|floatformat:0 }}</h3><p>Total Collected</p></div></div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card blue"><div class="stat-icon blue"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info"><h3>{{ paid_count }}</h3><p>Paid</p></div></div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card orange"><div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+                <div class="stat-info"><h3>{{ pending_count }}</h3><p>Pending</p></div></div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-bolt me-2 text-accent-blue"></i>Quick Actions</h5>
+                <div class="quick-actions">
+                    <a href="{% url 'fees_pay' %}" class="quick-action-btn"><i class="fas fa-rupee-sign"></i><span>Record Payment</span></a>
+                    <a href="{% url 'fees_history' %}" class="quick-action-btn"><i class="fas fa-history"></i><span>Payment History</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-list me-2 text-accent-purple"></i>Fee Structures</h5>
+                <div class="table-responsive">
+                    <table class="erp-table">
+                        <thead><tr><th>Course</th><th>Semester</th><th>Total</th><th>Year</th></tr></thead>
+                        <tbody>
+                            {% for fs in fee_structures %}
+                            <tr>
+                                <td style="font-weight:500;color:var(--text-primary);">{{ fs.course.name }}</td>
+                                <td>Sem {{ fs.semester }}</td>
+                                <td style="font-weight:600;color:var(--accent-green);">₹{{ fs.total_fee|floatformat:0 }}</td>
+                                <td>{{ fs.academic_year.label }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center" style="color:var(--text-muted);padding:16px;">No fee structures</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-clock me-2 text-accent-green"></i>Recent Payments</h5>
+                {% for p in recent_payments %}
+                <div class="d-flex align-items-center gap-3 p-2 rounded mb-2" style="background:var(--bg-hover);">
+                    <div class="stat-icon green" style="width:36px;height:36px;font-size:14px;"><i class="fas fa-check"></i></div>
+                    <div class="flex-grow-1">
+                        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">{{ p.student.user.get_full_name }}</div>
+                        <div style="font-size:11px;color:var(--text-muted);">{{ p.receipt_number }} • {{ p.paid_at|date:"d M Y" }}</div>
+                    </div>
+                    <div style="font-weight:600;color:var(--accent-green);">₹{{ p.amount_paid|floatformat:0 }}</div>
+                </div>
+                {% empty %}
+                <p style="color:var(--text-muted);text-align:center;padding:16px;">No recent payments</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

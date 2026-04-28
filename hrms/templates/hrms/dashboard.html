@@ -1,0 +1,124 @@
+{% extends 'core/base.html' %}
+{% block title %}HRMS — CampusPro{% endblock %}
+{% block page_title %}Human Resources{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Top Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card blue">
+                <div class="stat-icon blue"><i class="fas fa-user-tie"></i></div>
+                <div class="stat-info"><h3>{{ total_staff }}</h3><p>Total Staff</p></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card orange">
+                <div class="stat-icon orange"><i class="fas fa-bed"></i></div>
+                <div class="stat-info"><h3>{{ on_leave_today }}</h3><p>On Leave Today</p></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card red" style="--accent-color: var(--accent-red);">
+                <div class="stat-icon" style="background: var(--gradient-orange); box-shadow: 0 0 20px rgba(239,68,68,0.15);"><i class="fas fa-hourglass-half"></i></div>
+                <div class="stat-info"><h3>{{ pending_leaves }}</h3><p>Pending Approvals</p></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card green">
+                <div class="stat-icon green"><i class="fas fa-user-plus"></i></div>
+                <div class="stat-info"><h3>{{ added_this_month }}</h3><p>Added This Month</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts & Actions -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="chart-container" style="height: 380px;">
+                <h5><i class="fas fa-chart-bar me-2 text-accent-blue"></i>Staff by Department</h5>
+                <canvas id="deptStaffChart" style="height: 300px;"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="erp-card" style="height: 380px; overflow-y: auto;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fas fa-bell me-2 text-accent-orange"></i>Pending Approvals</h5>
+                    <a href="{% url 'hrms_leave_list' %}?status=pending" class="btn-outline-erp btn-sm">View All</a>
+                </div>
+                
+                <div class="d-flex flex-column gap-2">
+                    {% for l in recent_pending %}
+                    <div class="d-flex justify-content-between align-items-center p-3 rounded" style="background: var(--bg-hover); border: 1px solid var(--border-color);">
+                        <div>
+                            <div style="font-weight: 500; font-size: 14px;">{{ l.staff.user.get_full_name }}</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">{{ l.leave_type.name }} &bull; {{ l.days }} days ({{ l.from_date|date:"d M" }})</div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <form method="post" action="{% url 'leave_action' l.pk %}">
+                                {% csrf_token %}
+                                <button name="action" value="approved" class="btn-success-erp btn-sm" style="padding: 6px 10px;" title="Approve"><i class="fas fa-check"></i></button>
+                                <button name="action" value="rejected" class="btn-outline-erp btn-sm" style="padding: 6px 10px; color: var(--accent-red); border-color: rgba(239,68,68,0.3);" title="Reject"><i class="fas fa-times"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state py-4">
+                        <i class="fas fa-check-circle text-accent-green mb-2" style="font-size: 32px;"></i>
+                        <p class="mb-0 text-muted">No pending leave requests.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Staff Directory -->
+    <div class="erp-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="fas fa-users me-2 text-accent-green"></i>Staff Directory</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Emp ID</th><th>Name</th><th>Department</th><th>Designation</th><th>Joining</th><th>Action</th></tr></thead>
+                <tbody>
+                    {% for s in staff_list %}
+                    <tr>
+                        <td style="font-weight:600;color:var(--accent-blue);">{{ s.employee_id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--gradient-purple); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">
+                                    {% if s.user.first_name %}{{ s.user.first_name.0 }}{% else %}{{ s.user.username.0|upper }}{% endif %}
+                                </div>
+                                <span style="font-weight:500;color:var(--text-primary);">{{ s.user.get_full_name }}</span>
+                            </div>
+                        </td>
+                        <td>{{ s.department.name|default:"—" }}</td>
+                        <td><span class="badge-status info">{{ s.get_designation_display }}</span></td>
+                        <td>{{ s.date_of_joining|date:"d M Y" }}</td>
+                        <td><a href="{% url 'staff_detail' s.pk %}" class="btn-outline-erp btn-sm"><i class="fas fa-eye"></i> View</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center" style="padding:24px;color:var(--text-muted);">No staff records found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const deptLabels = {{ dept_labels|safe }};
+    const deptCounts = {{ dept_counts|safe }};
+    if(deptLabels.length > 0) {
+        createChart('deptStaffChart', 'bar', deptLabels, [{
+            label: 'Staff Count',
+            data: deptCounts,
+            backgroundColor: ['#7c3aed', '#10b981', '#f59e0b', '#06b6d4', '#ec4899'],
+            borderRadius: 4
+        }]);
+    }
+</script>
+{% endblock %}

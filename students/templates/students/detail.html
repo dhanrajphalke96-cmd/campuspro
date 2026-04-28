@@ -1,0 +1,72 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ student.user.get_full_name }} — College ERP{% endblock %}
+{% block page_title %}Student Profile{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="erp-card text-center">
+                <div class="sidebar-user-avatar mx-auto mb-3" style="width:80px;height:80px;font-size:32px;">
+                    {{ student.user.first_name.0 }}
+                </div>
+                <h4>{{ student.user.get_full_name }}</h4>
+                <p class="text-accent-blue mb-1">{{ student.enrollment_no }}</p>
+                <p style="color:var(--text-muted);font-size:13px;">{{ student.course.name }} — Semester {{ student.current_semester }}</p>
+                <div class="d-flex justify-content-center gap-3 mt-3">
+                    <div><small class="text-muted">Division</small><div style="font-weight:600;">{{ student.division }}</div></div>
+                    <div><small class="text-muted">Category</small><div><span class="badge-status info">{{ student.get_category_display }}</span></div></div>
+                    <div><small class="text-muted">Blood</small><div>{{ student.blood_group|default:"—" }}</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="erp-card mb-3">
+                <h5 class="mb-3"><i class="fas fa-info-circle me-2 text-accent-blue"></i>Personal Details</h5>
+                <div class="row g-3">
+                    <div class="col-md-6"><small class="text-muted">Email</small><div>{{ student.user.email }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Phone</small><div>{{ student.user.phone|default:"—" }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Date of Birth</small><div>{{ student.user.date_of_birth|date:"d M Y"|default:"—" }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Admission Date</small><div>{{ student.admission_date|date:"d M Y" }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Department</small><div>{{ student.department.name }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Nationality</small><div>{{ student.nationality }}</div></div>
+                </div>
+            </div>
+
+            {% if parent %}
+            <div class="erp-card mb-3">
+                <h5 class="mb-3"><i class="fas fa-users me-2 text-accent-green"></i>Parent Details</h5>
+                <div class="row g-3">
+                    <div class="col-md-6"><small class="text-muted">Father</small><div>{{ parent.father_name }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Father Phone</small><div>{{ parent.father_phone|default:"—" }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Mother</small><div>{{ parent.mother_name }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Annual Income</small><div>₹{{ parent.annual_income|default:"—" }}</div></div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-chart-line me-2 text-accent-purple"></i>Academic History</h5>
+                <div class="table-responsive">
+                    <table class="erp-table">
+                        <thead><tr><th>Semester</th><th>SGPA</th><th>CGPA</th><th>%</th><th>Status</th></tr></thead>
+                        <tbody>
+                            {% for ah in academic_history %}
+                            <tr>
+                                <td>Sem {{ ah.semester }}</td>
+                                <td>{{ ah.sgpa|default:"—" }}</td>
+                                <td>{{ ah.cgpa|default:"—" }}</td>
+                                <td>{{ ah.percentage|default:"—" }}%</td>
+                                <td><span class="badge-status {% if ah.status == 'pass' %}active{% elif ah.status == 'fail' %}rejected{% else %}pending{% endif %}">{{ ah.get_status_display }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center" style="color:var(--text-muted);padding:16px;">No academic records yet</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

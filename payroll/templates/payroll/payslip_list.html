@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% block title %}Payslips — College ERP{% endblock %}
+{% block page_title %}All Payslips{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-file-invoice me-2 text-accent-blue"></i>Payslip Records</h5>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Employee</th><th>Month</th><th>Year</th><th>Gross</th><th>Deductions</th><th>Net</th><th>Status</th></tr></thead>
+                <tbody>
+                    {% for p in payslips %}
+                    <tr>
+                        <td style="font-weight:500;color:var(--text-primary);">{{ p.staff.user.get_full_name }}</td>
+                        <td>{{ p.get_month_display }}</td>
+                        <td>{{ p.year }}</td>
+                        <td>₹{{ p.gross_salary|floatformat:0 }}</td>
+                        <td style="color:var(--accent-red);">₹{{ p.total_deductions|floatformat:0 }}</td>
+                        <td style="font-weight:600;color:var(--accent-green);">₹{{ p.net_salary|floatformat:0 }}</td>
+                        <td><span class="badge-status {{ p.status }}">{{ p.get_status_display }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center" style="padding:24px;color:var(--text-muted);">No payslips</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

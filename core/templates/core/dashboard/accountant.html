@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+{% block title %}Accountant Dashboard — College ERP{% endblock %}
+{% block page_title %}Accountant Dashboard{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card blue">
+                <div class="stat-icon blue"><i class="fas fa-rupee-sign"></i></div>
+                <div class="stat-info"><h3>{{ total_collected }}</h3><p>Total Collection</p></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card orange">
+                <div class="stat-icon orange"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="stat-info"><h3>{{ pending_count }}</h3><p>Pending Fees</p></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card green">
+                <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info"><h3>—</h3><p>Paid Today</p></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card purple">
+                <div class="stat-icon purple"><i class="fas fa-money-check-alt"></i></div>
+                <div class="stat-info"><h3>—</h3><p>Scholarships</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-bolt me-2 text-accent-blue"></i>Quick Actions</h5>
+                <div class="quick-actions">
+                    <a href="{% url 'fees_dashboard' %}" class="quick-action-btn"><i class="fas fa-rupee-sign"></i><span>Fee Management</span></a>
+                    <a href="{% url 'payroll_dashboard' %}" class="quick-action-btn"><i class="fas fa-money-check-alt"></i><span>Payroll</span></a>
+                    <a href="{% url 'hrms_leave_list' %}" class="quick-action-btn"><i class="fas fa-calendar-alt"></i><span>My Leaves</span></a>
+                    <a href="{% url 'profile' %}" class="quick-action-btn"><i class="fas fa-user"></i><span>My Profile</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

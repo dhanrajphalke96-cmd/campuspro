@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+{% block title %}New Application — College ERP{% endblock %}
+{% block page_title %}New Admission Application{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-user-plus me-2 text-accent-blue"></i>Application Form</h5>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-4"><label class="form-label">First Name *</label>{{ form.first_name }}</div>
+                <div class="col-md-4"><label class="form-label">Last Name *</label>{{ form.last_name }}</div>
+                <div class="col-md-4"><label class="form-label">Email *</label>{{ form.email }}</div>
+                <div class="col-md-4"><label class="form-label">Phone *</label>{{ form.phone }}</div>
+                <div class="col-md-4"><label class="form-label">Date of Birth *</label>{{ form.date_of_birth }}</div>
+                <div class="col-md-4"><label class="form-label">Gender *</label>{{ form.gender }}</div>
+                <div class="col-md-4"><label class="form-label">Category *</label>{{ form.category }}</div>
+                <div class="col-md-4"><label class="form-label">Course *</label>{{ form.course }}</div>
+                <div class="col-md-4"><label class="form-label">Academic Year *</label>{{ form.academic_year }}</div>
+                <div class="col-12"><label class="form-label">Address *</label>{{ form.address }}</div>
+                <div class="col-md-4"><label class="form-label">City *</label>{{ form.city }}</div>
+                <div class="col-md-4"><label class="form-label">State</label>{{ form.state }}</div>
+                <div class="col-md-4"><label class="form-label">Pincode *</label>{{ form.pincode }}</div>
+                <div class="col-md-6"><label class="form-label">Previous Qualification</label>{{ form.previous_qualification }}</div>
+                <div class="col-md-6"><label class="form-label">Previous Percentage</label>{{ form.previous_percentage }}</div>
+                <div class="col-12 mt-3">
+                    <button type="submit" class="btn-primary-erp"><i class="fas fa-paper-plane"></i> Submit Application</button>
+                    <a href="{% url 'admission_list' %}" class="btn-outline-erp ms-2">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

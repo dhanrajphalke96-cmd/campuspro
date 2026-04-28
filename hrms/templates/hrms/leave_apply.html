@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% block title %}Apply Leave — CampusPro{% endblock %}
+{% block page_title %}Apply for Leave{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card" style="max-width:600px; margin: 0 auto;">
+        <h5 class="mb-4 pb-3 border-bottom"><i class="fas fa-calendar-plus me-2 text-accent-blue"></i>Leave Application</h5>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="form-label text-muted" style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Select Leave Type <span class="text-danger">*</span></label>
+                <select name="leave_type" class="form-select form-select-lg" style="font-size: 14px;" required>
+                    <option value="" disabled selected>-- Select a leave type --</option>
+                    {% for lt in leave_types %}<option value="{{ lt.pk }}">{{ lt.name }} (Balance: {{ lt.max_days_per_year }} days/year)</option>{% endfor %}
+                </select>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6"><label class="form-label">From Date *</label><input type="date" name="from_date" class="form-control" required></div>
+                <div class="col-md-6"><label class="form-label">To Date *</label><input type="date" name="to_date" class="form-control" required></div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Reason *</label>
+                <textarea name="reason" class="form-control" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn-primary-erp"><i class="fas fa-paper-plane"></i> Submit</button>
+            <a href="{% url 'hrms_leave_list' %}" class="btn-outline-erp ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

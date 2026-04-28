@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+{% block title %}Examinations — College ERP{% endblock %}
+{% block page_title %}Examination Management{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="fas fa-file-alt me-2 text-accent-blue"></i>All Examinations</h5>
+            <a href="{% url 'result_list' %}" class="btn-primary-erp btn-sm"><i class="fas fa-chart-bar"></i> View Results</a>
+        </div>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Exam</th><th>Subject</th><th>Type</th><th>Date</th><th>Marks</th><th>Published</th><th>Action</th></tr></thead>
+                <tbody>
+                    {% for e in exams %}
+                    <tr>
+                        <td style="font-weight:500;color:var(--text-primary);">{{ e.name }}</td>
+                        <td>{{ e.subject.name }}</td>
+                        <td><span class="badge-status info">{{ e.get_exam_type_display }}</span></td>
+                        <td>{{ e.date|date:"d M Y" }}</td>
+                        <td>{{ e.total_marks }}</td>
+                        <td><span class="badge-status {% if e.is_published %}active{% else %}pending{% endif %}">{% if e.is_published %}Yes{% else %}No{% endif %}</span></td>
+                        <td>
+                            <a href="{% url 'exam_detail' e.pk %}" class="btn-outline-erp btn-sm"><i class="fas fa-eye"></i></a>
+                            <a href="{% url 'marks_entry' e.pk %}" class="btn-primary-erp btn-sm"><i class="fas fa-pen"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center" style="padding:24px;color:var(--text-muted);">No exams scheduled</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

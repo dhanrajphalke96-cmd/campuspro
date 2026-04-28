@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+{% block title %}404 Not Found — CampusPro{% endblock %}
+{% block page_title %}Page Not Found{% endblock %}
+
+{% block content %}
+<div class="fade-in d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="text-center">
+        <h1 style="font-size: 8rem; font-weight: 800; color: var(--accent-blue); line-height: 1;">404</h1>
+        <h3 class="mb-3">Oops! Page not found.</h3>
+        <p class="text-muted mb-4">The page you are looking for might have been removed or is temporarily unavailable.</p>
+        <a href="{% url 'dashboard' %}" class="btn-primary-erp"><i class="fas fa-home me-2"></i>Back to Home</a>
+    </div>
+</div>
+{% endblock %}

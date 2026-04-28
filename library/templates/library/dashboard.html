@@ -1,0 +1,74 @@
+{% extends 'core/base.html' %}
+{% block title %}Library — College ERP{% endblock %}
+{% block page_title %}Library Management{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card blue"><div class="stat-icon blue"><i class="fas fa-book"></i></div>
+                <div class="stat-info"><h3>{{ total_books }}</h3><p>Total Books</p></div></div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card green"><div class="stat-icon green"><i class="fas fa-book-reader"></i></div>
+                <div class="stat-info"><h3>{{ issued_count }}</h3><p>Books Issued</p></div></div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card orange"><div class="stat-icon orange"><i class="fas fa-exclamation-circle"></i></div>
+                <div class="stat-info"><h3>{{ overdue_count }}</h3><p>Overdue</p></div></div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-bolt me-2 text-accent-blue"></i>Quick Actions</h5>
+                <div class="quick-actions">
+                    <a href="{% url 'book_issue_create' %}" class="quick-action-btn"><i class="fas fa-book-reader"></i><span>Issue Book</span></a>
+                    <a href="{% url 'book_issue_list' %}" class="quick-action-btn"><i class="fas fa-list"></i><span>All Issues</span></a>
+                    <a href="{% url 'library_card_list' %}" class="quick-action-btn"><i class="fas fa-id-card"></i><span>Library Cards</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="erp-card">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h5 class="mb-0"><i class="fas fa-book me-2 text-accent-green"></i>Book Catalog</h5>
+            <form class="d-flex gap-2" method="get">
+                <input type="text" name="search" class="form-control" placeholder="Search title/author/ISBN..." value="{{ request.GET.search }}" style="max-width:250px;">
+                <select name="category" class="form-select" style="max-width:150px;" onchange="this.form.submit()">
+                    <option value="">All Types</option>
+                    <option value="textbook">Textbook</option>
+                    <option value="reference">Reference</option>
+                    <option value="journal">Journal</option>
+                </select>
+                <button type="submit" class="btn-primary-erp btn-sm"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th>Available</th><th>Shelf</th></tr></thead>
+                <tbody>
+                    {% for b in books %}
+                    <tr>
+                        <td style="font-weight:500;color:var(--text-primary);">{{ b.title }}</td>
+                        <td>{{ b.author }}</td>
+                        <td style="font-size:12px;color:var(--text-muted);">{{ b.isbn|default:"—" }}</td>
+                        <td><span class="badge-status info">{{ b.get_category_display }}</span></td>
+                        <td>
+                            <span class="{% if b.available_copies > 0 %}text-accent-green{% else %}text-accent-red{% endif %}" style="font-weight:600;">
+                                {{ b.available_copies }}/{{ b.total_copies }}
+                            </span>
+                        </td>
+                        <td>{{ b.shelf_number|default:"—" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center" style="padding:24px;color:var(--text-muted);">No books found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

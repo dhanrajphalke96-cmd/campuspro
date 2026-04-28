@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+{% block title %}Attendance Report — College ERP{% endblock %}
+{% block page_title %}Attendance Report{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card mb-4">
+        <h5 class="mb-3"><i class="fas fa-chart-bar me-2 text-accent-blue"></i>Filter Report</h5>
+        <form method="get" class="d-flex gap-3 flex-wrap">
+            <select name="subject" class="form-select" style="max-width:250px;" onchange="this.form.submit()">
+                <option value="">Select Subject</option>
+                {% for sub in subjects %}
+                <option value="{{ sub.pk }}" {% if request.GET.subject == sub.pk|stringformat:"d" %}selected{% endif %}>{{ sub.name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% if report_data %}
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-table me-2 text-accent-green"></i>Attendance Summary</h5>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Enrollment</th><th>Name</th><th>Total</th><th>Present</th><th>Absent</th><th>Percentage</th></tr></thead>
+                <tbody>
+                    {% for r in report_data %}
+                    <tr>
+                        <td style="font-weight:600;color:var(--accent-blue);">{{ r.student.enrollment_no }}</td>
+                        <td>{{ r.student.user.get_full_name }}</td>
+                        <td>{{ r.total }}</td>
+                        <td style="color:var(--accent-green);">{{ r.present }}</td>
+                        <td style="color:var(--accent-red);">{{ r.absent }}</td>
+                        <td>
+                            <span class="badge-status {% if r.percentage >= 75 %}active{% elif r.percentage >= 60 %}pending{% else %}rejected{% endif %}">
+                                {{ r.percentage }}%
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+{% block title %}HOD Dashboard — College ERP{% endblock %}
+{% block page_title %}HOD Dashboard{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card blue">
+                <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                <div class="stat-info"><h3>{{ total_students }}</h3><p>Students</p></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card green">
+                <div class="stat-icon green"><i class="fas fa-chalkboard-teacher"></i></div>
+                <div class="stat-info"><h3>{{ total_faculty }}</h3><p>Faculty</p></div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card purple">
+                <div class="stat-icon purple"><i class="fas fa-book-open"></i></div>
+                <div class="stat-info"><h3>{{ hod_dept.name }}</h3><p>Your Department</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-12">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-bolt me-2 text-accent-blue"></i>Quick Actions</h5>
+                <div class="quick-actions">
+                    <a href="{% url 'student_list' %}" class="quick-action-btn"><i class="fas fa-users"></i><span>Department Students</span></a>
+                    <a href="{% url 'attendance_dashboard' %}" class="quick-action-btn"><i class="fas fa-clipboard-check"></i><span>Attendance Reports</span></a>
+                    <a href="{% url 'exam_list' %}" class="quick-action-btn"><i class="fas fa-file-alt"></i><span>Exams Data</span></a>
+                    <a href="{% url 'hrms_leave_list' %}" class="quick-action-btn"><i class="fas fa-calendar-alt"></i><span>My Leaves</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

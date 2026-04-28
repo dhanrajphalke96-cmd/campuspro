@@ -1,0 +1,58 @@
+{% extends 'core/base.html' %}
+{% block title %}Leave Requests — CampusPro{% endblock %}
+{% block page_title %}Leave Requests{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0"><i class="fas fa-calendar-times me-2 text-accent-orange"></i>Leave Requests</h5>
+            <a href="{% url 'leave_apply' %}" class="btn-primary-erp btn-sm"><i class="fas fa-plus"></i> Apply Leave</a>
+        </div>
+        
+        <!-- Status Tabs -->
+        <ul class="nav nav-pills mb-3 border-bottom pb-2" style="gap: 8px;">
+            <li class="nav-item">
+                <a class="nav-link {% if not request.GET.status %}active{% endif %}" href="{% url 'hrms_leave_list' %}" style="padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;">All</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.GET.status == 'pending' %}active{% endif %}" href="?status=pending" style="padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;">Pending</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.GET.status == 'approved' %}active{% endif %}" href="?status=approved" style="padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;">Approved</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.GET.status == 'rejected' %}active{% endif %}" href="?status=rejected" style="padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;">Rejected</a>
+            </li>
+        </ul>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Staff</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>
+                    {% for l in leaves %}
+                    <tr>
+                        <td style="font-weight:500;color:var(--text-primary);">{{ l.staff.user.get_full_name }}</td>
+                        <td>{{ l.leave_type.name }}</td>
+                        <td>{{ l.from_date|date:"d M Y" }}</td>
+                        <td>{{ l.to_date|date:"d M Y" }}</td>
+                        <td>{{ l.days }}</td>
+                        <td><span class="badge-status {{ l.status }}">{{ l.get_status_display }}</span></td>
+                        <td>
+                            {% if l.status == 'pending' and user.role in 'admin,principal,hod,hr' %}
+                            <form method="post" action="{% url 'leave_action' l.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button name="action" value="approved" class="btn-success-erp btn-sm"><i class="fas fa-check"></i></button>
+                                <button name="action" value="rejected" class="btn-danger-erp btn-sm"><i class="fas fa-times"></i></button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center" style="padding:24px;color:var(--text-muted);">No leave requests</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

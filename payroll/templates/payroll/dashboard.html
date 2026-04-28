@@ -1,0 +1,56 @@
+{% extends 'core/base.html' %}
+{% block title %}Payroll — College ERP{% endblock %}
+{% block page_title %}Payroll Management{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card green"><div class="stat-icon green"><i class="fas fa-money-check-alt"></i></div>
+                <div class="stat-info"><h3>₹{{ total_paid|floatformat:0 }}</h3><p>Total Disbursed</p></div></div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-chart-bar me-2 text-accent-blue"></i>Salary Structures</h5>
+                <div class="table-responsive">
+                    <table class="erp-table">
+                        <thead><tr><th>Designation</th><th>Basic</th><th>Gross</th><th>Net</th></tr></thead>
+                        <tbody>
+                            {% for s in structures %}
+                            <tr>
+                                <td style="font-weight:500;color:var(--text-primary);">{{ s.designation }}</td>
+                                <td>₹{{ s.basic_pay|floatformat:0 }}</td>
+                                <td>₹{{ s.gross_salary|floatformat:0 }}</td>
+                                <td style="font-weight:600;color:var(--accent-green);">₹{{ s.net_salary|floatformat:0 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center" style="color:var(--text-muted);padding:16px;">No structures defined</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-file-invoice me-2 text-accent-green"></i>Recent Payslips</h5>
+                {% for p in recent_payslips %}
+                <div class="d-flex align-items-center gap-3 p-2 rounded mb-2" style="background:var(--bg-hover);">
+                    <div class="flex-grow-1">
+                        <div style="font-size:13px;font-weight:500;color:var(--text-primary);">{{ p.staff.user.get_full_name }}</div>
+                        <div style="font-size:11px;color:var(--text-muted);">{{ p.get_month_display }} {{ p.year }}</div>
+                    </div>
+                    <span class="badge-status {{ p.status }}">{{ p.get_status_display }}</span>
+                    <div style="font-weight:600;color:var(--accent-green);">₹{{ p.net_salary|floatformat:0 }}</div>
+                </div>
+                {% empty %}
+                <p style="color:var(--text-muted);text-align:center;padding:16px;">No payslips yet</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+{% block title %}Library Cards — College ERP{% endblock %}
+{% block page_title %}Library Cards{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-id-card me-2 text-accent-blue"></i>Active Library Cards</h5>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Card No.</th><th>Student</th><th>Issued</th><th>Valid Until</th><th>Max Books</th><th>Status</th></tr></thead>
+                <tbody>
+                    {% for c in cards %}
+                    <tr>
+                        <td style="font-weight:600;color:var(--accent-blue);">{{ c.card_number }}</td>
+                        <td style="font-weight:500;color:var(--text-primary);">{{ c.student.user.get_full_name }}</td>
+                        <td>{{ c.issued_date|date:"d M Y" }}</td>
+                        <td>{{ c.valid_until|date:"d M Y" }}</td>
+                        <td>{{ c.max_books }}</td>
+                        <td><span class="badge-status {% if c.is_active %}active{% else %}rejected{% endif %}">{% if c.is_active %}Active{% else %}Expired{% endif %}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center" style="padding:24px;color:var(--text-muted);">No library cards</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

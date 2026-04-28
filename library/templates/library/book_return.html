@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+{% block title %}Return Book — College ERP{% endblock %}
+{% block page_title %}Return Book{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card" style="max-width:500px;">
+        <h5 class="mb-3"><i class="fas fa-undo me-2 text-accent-green"></i>Confirm Return</h5>
+        <div class="mb-3">
+            <div class="row g-3">
+                <div class="col-6"><small class="text-muted">Book</small><div style="font-weight:500;">{{ issue.book.title }}</div></div>
+                <div class="col-6"><small class="text-muted">Student</small><div>{{ issue.student.user.get_full_name }}</div></div>
+                <div class="col-6"><small class="text-muted">Issue Date</small><div>{{ issue.issue_date|date:"d M Y" }}</div></div>
+                <div class="col-6"><small class="text-muted">Due Date</small><div>{{ issue.due_date|date:"d M Y" }}</div></div>
+            </div>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-success-erp"><i class="fas fa-check"></i> Confirm Return</button>
+            <a href="{% url 'book_issue_list' %}" class="btn-outline-erp ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

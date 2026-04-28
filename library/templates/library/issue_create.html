@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+{% block title %}Issue Book — College ERP{% endblock %}
+{% block page_title %}Issue a Book{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card" style="max-width:600px;">
+        <h5 class="mb-3"><i class="fas fa-book-reader me-2 text-accent-blue"></i>Issue Book</h5>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Book *</label>
+                <select name="book" class="form-select" required>
+                    <option value="">Select Book</option>
+                    {% for b in books %}<option value="{{ b.pk }}">{{ b.title }} by {{ b.author }} ({{ b.available_copies }} avail)</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Student *</label>
+                <select name="student" class="form-select" required>
+                    <option value="">Select Student</option>
+                    {% for s in students %}<option value="{{ s.pk }}">{{ s.enrollment_no }} - {{ s.user.get_full_name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Due Days</label>
+                <input type="number" name="due_days" class="form-control" value="14" min="1" max="90">
+            </div>
+            <button type="submit" class="btn-success-erp"><i class="fas fa-book-reader"></i> Issue Book</button>
+            <a href="{% url 'book_issue_list' %}" class="btn-outline-erp ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

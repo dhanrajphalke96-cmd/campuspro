@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+{% block title %}Librarian Dashboard — College ERP{% endblock %}
+{% block page_title %}Librarian Dashboard{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card blue">
+                <div class="stat-icon blue"><i class="fas fa-book"></i></div>
+                <div class="stat-info"><h3>{{ total_books }}</h3><p>Total Books</p></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card green">
+                <div class="stat-icon green"><i class="fas fa-book-reader"></i></div>
+                <div class="stat-info"><h3>{{ issued_count }}</h3><p>Books Issued</p></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card orange">
+                <div class="stat-icon orange"><i class="fas fa-exclamation-circle"></i></div>
+                <div class="stat-info"><h3>{{ overdue_count }}</h3><p>Overdue</p></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card purple">
+                <div class="stat-icon purple"><i class="fas fa-id-card"></i></div>
+                <div class="stat-info"><h3>—</h3><p>Library Cards</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-bolt me-2 text-accent-blue"></i>Quick Actions</h5>
+                <div class="quick-actions">
+                    <a href="{% url 'library_dashboard' %}" class="quick-action-btn"><i class="fas fa-book"></i><span>Book Catalog</span></a>
+                    <a href="{% url 'book_issue_list' %}" class="quick-action-btn"><i class="fas fa-book-reader"></i><span>Issue/Return</span></a>
+                    <a href="{% url 'library_card_list' %}" class="quick-action-btn"><i class="fas fa-id-card"></i><span>Library Cards</span></a>
+                    <a href="{% url 'hrms_leave_list' %}" class="quick-action-btn"><i class="fas fa-calendar-alt"></i><span>My Leaves</span></a>
+                    <a href="{% url 'profile' %}" class="quick-action-btn"><i class="fas fa-user"></i><span>My Profile</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

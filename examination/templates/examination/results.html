@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% block title %}Results — College ERP{% endblock %}
+{% block page_title %}Exam Results{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-chart-bar me-2 text-accent-blue"></i>Published Results</h5>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Enrollment</th><th>Name</th><th>Semester</th><th>SGPA</th><th>CGPA</th><th>%</th><th>Status</th></tr></thead>
+                <tbody>
+                    {% for r in results %}
+                    <tr>
+                        <td style="font-weight:600;color:var(--accent-blue);">{{ r.student.enrollment_no }}</td>
+                        <td style="font-weight:500;color:var(--text-primary);">{{ r.student.user.get_full_name }}</td>
+                        <td>Sem {{ r.semester }}</td>
+                        <td>{{ r.sgpa|default:"—" }}</td>
+                        <td>{{ r.cgpa|default:"—" }}</td>
+                        <td>{{ r.percentage|default:"—" }}%</td>
+                        <td><span class="badge-status {% if r.status == 'pass' %}active{% elif r.status == 'fail' %}rejected{% else %}pending{% endif %}">{{ r.get_status_display }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center" style="padding:24px;color:var(--text-muted);">No results published</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,179 @@
+{% extends 'core/base.html' %}
+{% block title %}Admin Dashboard — College ERP{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card blue">
+                <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                <div class="stat-info">
+                    <h3>{{ total_students }}</h3>
+                    <p>Total Students</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card green">
+                <div class="stat-icon green"><i class="fas fa-chalkboard-teacher"></i></div>
+                <div class="stat-info">
+                    <h3>{{ total_faculty }}</h3>
+                    <p>Faculty Members</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card purple">
+                <div class="stat-icon purple"><i class="fas fa-building"></i></div>
+                <div class="stat-info">
+                    <h3>{{ total_departments }}</h3>
+                    <p>Departments</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card orange">
+                <div class="stat-icon orange"><i class="fas fa-book-open"></i></div>
+                <div class="stat-info">
+                    <h3>{{ total_courses }}</h3>
+                    <p>Active Courses</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-8">
+            <div class="chart-container" style="height: 320px;">
+                <h5><i class="fas fa-chart-bar me-2 text-accent-blue"></i>Department-wise Students</h5>
+                <canvas id="deptChart" style="height: 250px;"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="chart-container" style="height: 320px;">
+                <h5><i class="fas fa-chart-pie me-2 text-accent-green"></i>User Roles</h5>
+                <canvas id="roleChart" style="height: 250px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions & Modules -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-th me-2 text-accent-blue"></i>Quick Access Modules</h5>
+                <div class="row g-3">
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'admission_list' %}" class="module-card blue d-block text-decoration-none">
+                            <div class="module-icon blue"><i class="fas fa-user-plus"></i></div>
+                            <h4>Admissions</h4>
+                            <p>Manage applications</p>
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'student_list' %}" class="module-card green d-block text-decoration-none">
+                            <div class="module-icon green"><i class="fas fa-users"></i></div>
+                            <h4>Students</h4>
+                            <p>Student records</p>
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'attendance_dashboard' %}" class="module-card purple d-block text-decoration-none">
+                            <div class="module-icon purple"><i class="fas fa-clipboard-check"></i></div>
+                            <h4>Attendance</h4>
+                            <p>Track attendance</p>
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'fees_dashboard' %}" class="module-card orange d-block text-decoration-none">
+                            <div class="module-icon orange"><i class="fas fa-rupee-sign"></i></div>
+                            <h4>Fees</h4>
+                            <p>Fee management</p>
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'exam_list' %}" class="module-card cyan d-block text-decoration-none">
+                            <div class="module-icon cyan"><i class="fas fa-file-alt"></i></div>
+                            <h4>Exams</h4>
+                            <p>Exam management</p>
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'library_dashboard' %}" class="module-card pink d-block text-decoration-none">
+                            <div class="module-icon pink"><i class="fas fa-book"></i></div>
+                            <h4>Library</h4>
+                            <p>Book management</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Notifications -->
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-bell me-2 text-accent-orange"></i>Recent Notifications</h5>
+                {% for notif in notifications %}
+                <div class="d-flex align-items-start gap-3 p-2 rounded mb-2" style="background: var(--bg-hover);">
+                    <i class="fas fa-circle mt-1" style="font-size:8px; color: var(--accent-{{ notif.notification_type }})"></i>
+                    <div>
+                        <div style="font-size:13px; font-weight:500;">{{ notif.title }}</div>
+                        <div style="font-size:12px; color: var(--text-muted);">{{ notif.created_at|timesince }} ago</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state py-3">
+                    <i class="fas fa-bell-slash"></i>
+                    <p class="mb-0">No new notifications</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-bolt me-2 text-accent-purple"></i>Quick Actions</h5>
+                <div class="quick-actions">
+                    <a href="{% url 'admission_create' %}" class="quick-action-btn"><i class="fas fa-user-plus"></i><span>New Admission</span></a>
+                    <a href="{% url 'student_list' %}" class="quick-action-btn"><i class="fas fa-search"></i><span>Find Student</span></a>
+                    <a href="{% url 'attendance_mark' %}" class="quick-action-btn"><i class="fas fa-clipboard-check"></i><span>Mark Attendance</span></a>
+                    <a href="{% url 'fees_dashboard' %}" class="quick-action-btn"><i class="fas fa-rupee-sign"></i><span>Fee Collection</span></a>
+                    <a href="{% url 'hrms_dashboard' %}" class="quick-action-btn"><i class="fas fa-user-tie"></i><span>Staff Records</span></a>
+                    <a href="{% url 'library_dashboard' %}" class="quick-action-btn"><i class="fas fa-book"></i><span>Library</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Department chart
+    const deptLabels = {{ dept_labels|safe }};
+    const deptCounts = {{ dept_counts|safe }};
+    createChart('deptChart', 'bar', deptLabels, [{
+        label: 'Students',
+        data: deptCounts,
+        backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#06b6d4'],
+        borderRadius: 6,
+        borderSkipped: false
+    }]);
+
+    // Role distribution chart
+    createChart('roleChart', 'doughnut',
+        ['Students', 'Faculty', 'Staff'],
+        [{
+            data: [{{ total_students }}, {{ total_faculty }}, {{ total_staff }}],
+            backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6'],
+            borderWidth: 0,
+            hoverOffset: 4
+        }],
+        { cutout: '65%' }
+    );
+</script>
+{% endblock %}

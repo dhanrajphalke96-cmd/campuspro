@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+{% block title %}My Profile — College ERP{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="erp-card text-center">
+                <div class="sidebar-user-avatar mx-auto mb-3" style="width:80px;height:80px;font-size:32px;">
+                    {% if user.first_name %}{{ user.first_name.0 }}{% else %}{{ user.username.0|upper }}{% endif %}
+                </div>
+                <h4>{{ user.get_full_name|default:user.username }}</h4>
+                <p class="text-accent-blue mb-1">{{ user.get_role_display }}</p>
+                <p style="color:var(--text-muted);font-size:13px;">{{ user.email }}</p>
+                {% if user.phone %}<p style="color:var(--text-muted);font-size:13px;"><i class="fas fa-phone me-1"></i>{{ user.phone }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-edit me-2 text-accent-blue"></i>Edit Profile</h5>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Date of Birth</label>
+                            {{ form.date_of_birth }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Profile Photo</label>
+                            {{ form.profile_photo }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn-primary-erp"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

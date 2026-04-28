@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% block title %}Notifications — College ERP{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        {% for notif in notifications %}
+        <div class="notif-item d-flex align-items-start gap-3 p-3 rounded mb-2 {% if notif.is_read %}read{% endif %}" style="background: {% if notif.is_read %}transparent{% else %}var(--bg-hover){% endif %};">
+            <i class="fas {% if notif.notification_type == 'success' %}fa-check-circle text-accent-green{% elif notif.notification_type == 'warning' %}fa-exclamation-triangle text-accent-orange{% elif notif.notification_type == 'danger' %}fa-times-circle text-accent-red{% else %}fa-info-circle text-accent-blue{% endif %} mt-1"></i>
+            <div class="flex-grow-1">
+                <div style="font-size:14px; font-weight:600;">{{ notif.title }}</div>
+                <div style="font-size:13px; color: var(--text-secondary);">{{ notif.message }}</div>
+                <div style="font-size:11px; color: var(--text-muted); margin-top:4px;">{{ notif.created_at|timesince }} ago</div>
+            </div>
+            {% if not notif.is_read %}
+            <button class="btn-outline-erp btn-sm notif-mark-read" data-pk="{{ notif.pk }}"><i class="fas fa-check"></i></button>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <i class="fas fa-bell-slash"></i>
+            <h4>No Notifications</h4>
+            <p>You're all caught up!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

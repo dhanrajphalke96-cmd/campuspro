@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+{% block title %}Staff Detail — College ERP{% endblock %}
+{% block page_title %}Staff Profile{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="erp-card text-center">
+                <div class="sidebar-user-avatar mx-auto mb-3" style="width:80px;height:80px;font-size:32px;background:var(--gradient-blue);">{{ staff.user.first_name.0 }}</div>
+                <h4>{{ staff.user.get_full_name }}</h4>
+                <p class="text-accent-blue mb-1">{{ staff.employee_id }}</p>
+                <p style="color:var(--text-muted);font-size:13px;">{{ staff.get_designation_display }}</p>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="erp-card mb-3">
+                <h5 class="mb-3"><i class="fas fa-info-circle me-2 text-accent-blue"></i>Details</h5>
+                <div class="row g-3">
+                    <div class="col-md-6"><small class="text-muted">Department</small><div>{{ staff.department.name|default:"—" }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Qualification</small><div>{{ staff.qualification|default:"—" }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Experience</small><div>{{ staff.experience_years }} years</div></div>
+                    <div class="col-md-6"><small class="text-muted">Date of Joining</small><div>{{ staff.date_of_joining|date:"d M Y" }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Email</small><div>{{ staff.user.email }}</div></div>
+                    <div class="col-md-6"><small class="text-muted">Phone</small><div>{{ staff.user.phone|default:"—" }}</div></div>
+                </div>
+            </div>
+            <div class="erp-card">
+                <h5 class="mb-3"><i class="fas fa-calendar-times me-2 text-accent-orange"></i>Recent Leaves</h5>
+                <div class="table-responsive">
+                    <table class="erp-table">
+                        <thead><tr><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Status</th></tr></thead>
+                        <tbody>
+                            {% for l in leaves %}
+                            <tr>
+                                <td>{{ l.leave_type.name }}</td>
+                                <td>{{ l.from_date|date:"d M" }}</td>
+                                <td>{{ l.to_date|date:"d M" }}</td>
+                                <td>{{ l.days }}</td>
+                                <td><span class="badge-status {{ l.status }}">{{ l.get_status_display }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center" style="color:var(--text-muted);padding:16px;">No leaves</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+{% block title %}Record Payment — College ERP{% endblock %}
+{% block page_title %}Record Fee Payment{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-rupee-sign me-2 text-accent-blue"></i>Payment Details</h5>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Student *</label>
+                    <select name="student" class="form-select" required>
+                        <option value="">Select Student</option>
+                        {% for s in students %}<option value="{{ s.pk }}">{{ s.enrollment_no }} - {{ s.user.get_full_name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Fee Structure *</label>
+                    <select name="fee_structure" class="form-select" required>
+                        <option value="">Select Structure</option>
+                        {% for fs in fee_structures %}<option value="{{ fs.pk }}">{{ fs.course.name }} - Sem {{ fs.semester }} (₹{{ fs.total_fee|floatformat:0 }})</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Amount (₹) *</label>
+                    <input type="number" name="amount" class="form-control" required step="0.01">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Payment Mode *</label>
+                    <select name="payment_mode" class="form-select" required>
+                        <option value="upi">UPI</option>
+                        <option value="netbanking">Net Banking</option>
+                        <option value="card">Debit/Credit Card</option>
+                        <option value="cash">Cash</option>
+                        <option value="dd">Demand Draft</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Transaction ID</label>
+                    <input type="text" name="transaction_id" class="form-control">
+                </div>
+                <div class="col-12 mt-3">
+                    <button type="submit" class="btn-success-erp"><i class="fas fa-check-circle"></i> Record Payment</button>
+                    <a href="{% url 'fees_dashboard' %}" class="btn-outline-erp ms-2">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends 'core/base.html' %}
+{% block title %}User Management — CampusPro{% endblock %}
+{% block page_title %}User Management{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card blue">
+                <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                <div class="stat-info">
+                    <h3>{{ total_users }}</h3>
+                    <p>Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card green">
+                <div class="stat-icon green"><i class="fas fa-user-check"></i></div>
+                <div class="stat-info">
+                    <h3>{{ active_users }}</h3>
+                    <p>Active Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="stat-card red" style="--accent-color: var(--accent-red);">
+                <div class="stat-icon" style="background: var(--gradient-orange); box-shadow: 0 0 20px rgba(245,158,11,0.15);"><i class="fas fa-user-times"></i></div>
+                <div class="stat-info">
+                    <h3>{{ inactive_users }}</h3>
+                    <p>Inactive Users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="erp-card mb-4">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Search Users</label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background: var(--bg-input); border-color: var(--border-color); color: var(--text-muted);"><i class="fas fa-search"></i></span>
+                    <input type="text" name="q" class="form-control" placeholder="Name, username, email..." value="{{ request.GET.q }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Role</label>
+                <select name="role" class="form-select">
+                    <option value="">All Roles</option>
+                    {% for r_value, r_label in roles %}
+                    <option value="{{ r_value }}" {% if request.GET.role == r_value %}selected{% endif %}>{{ r_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn-primary-erp w-100 justify-content-center">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- User Table -->
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-users-cog me-2 text-accent-blue"></i>User Directory</h5>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--gradient-blue); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
+                                    {% if u.first_name %}{{ u.first_name.0 }}{% else %}{{ u.username.0|upper }}{% endif %}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 500; color: var(--text-primary);">{{ u.get_full_name|default:u.username }}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">{{ u.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'assign_role' u.pk %}" class="d-flex gap-2">
+                                {% csrf_token %}
+                                <select name="role" class="form-select form-select-sm" style="width: 130px; font-size: 12px; padding: 4px 8px;" onchange="this.form.submit()">
+                                    {% for r_value, r_label in roles %}
+                                    <option value="{{ r_value }}" {% if u.role == r_value %}selected{% endif %}>{{ r_label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                            <span class="badge-status active">Active</span>
+                            {% else %}
+                            <span class="badge-status rejected">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ u.date_joined|date:"d M Y" }}</td>
+                        <td>
+                            <form method="post" action="{% url 'toggle_user_status' u.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                {% if u.is_active %}
+                                <button type="submit" class="btn-outline-erp btn-sm" style="color: var(--accent-red); border-color: rgba(239,68,68,0.3);" title="Deactivate User">
+                                    <i class="fas fa-ban"></i>
+                                </button>
+                                {% else %}
+                                <button type="submit" class="btn-outline-erp btn-sm" style="color: var(--accent-green); border-color: rgba(16,185,129,0.3);" title="Activate User">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                {% endif %}
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center" style="padding: 30px; color: var(--text-muted);">
+                            <i class="fas fa-search mb-2" style="font-size: 24px;"></i>
+                            <p class="mb-0">No users found matching your criteria.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

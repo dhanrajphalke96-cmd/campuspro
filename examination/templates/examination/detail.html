@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ exam.name }} — College ERP{% endblock %}
+{% block page_title %}{{ exam.name }}{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card mb-3">
+        <div class="row g-3">
+            <div class="col-md-3"><small class="text-muted">Subject</small><div style="font-weight:500;">{{ exam.subject.name }}</div></div>
+            <div class="col-md-3"><small class="text-muted">Type</small><div><span class="badge-status info">{{ exam.get_exam_type_display }}</span></div></div>
+            <div class="col-md-3"><small class="text-muted">Date</small><div>{{ exam.date|date:"d M Y" }}</div></div>
+            <div class="col-md-3"><small class="text-muted">Total / Pass</small><div>{{ exam.total_marks }} / {{ exam.passing_marks }}</div></div>
+        </div>
+    </div>
+
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-list me-2 text-accent-green"></i>Marks</h5>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Enrollment</th><th>Name</th><th>Marks</th><th>Absent</th><th>Status</th><th>Verified</th></tr></thead>
+                <tbody>
+                    {% for m in marks %}
+                    <tr>
+                        <td style="font-weight:600;color:var(--accent-blue);">{{ m.student.enrollment_no }}</td>
+                        <td>{{ m.student.user.get_full_name }}</td>
+                        <td>{{ m.marks_obtained }}/{{ exam.total_marks }}</td>
+                        <td>{% if m.is_absent %}<span class="badge-status absent">Yes</span>{% else %}No{% endif %}</td>
+                        <td><span class="badge-status {% if m.is_pass %}active{% else %}rejected{% endif %}">{% if m.is_pass %}Pass{% else %}Fail{% endif %}</span></td>
+                        <td>{% if m.verified %}<i class="fas fa-check text-accent-green"></i>{% else %}<i class="fas fa-clock text-accent-orange"></i>{% endif %}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center" style="padding:24px;color:var(--text-muted);">No marks entered</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

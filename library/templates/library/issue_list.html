@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% block title %}Book Issues — College ERP{% endblock %}
+{% block page_title %}Issue / Return{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="fas fa-book-reader me-2 text-accent-blue"></i>All Book Issues</h5>
+            <a href="{% url 'book_issue_create' %}" class="btn-primary-erp btn-sm"><i class="fas fa-plus"></i> Issue Book</a>
+        </div>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead><tr><th>Book</th><th>Student</th><th>Issued</th><th>Due</th><th>Returned</th><th>Fine</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>
+                    {% for i in issues %}
+                    <tr>
+                        <td style="font-weight:500;color:var(--text-primary);">{{ i.book.title }}</td>
+                        <td>{{ i.student.user.get_full_name }}</td>
+                        <td>{{ i.issue_date|date:"d M" }}</td>
+                        <td>{{ i.due_date|date:"d M" }}</td>
+                        <td>{{ i.return_date|date:"d M"|default:"—" }}</td>
+                        <td>{% if i.fine_amount %}₹{{ i.fine_amount|floatformat:0 }}{% else %}—{% endif %}</td>
+                        <td><span class="badge-status {% if i.status == 'returned' %}active{% elif i.status == 'overdue' %}rejected{% else %}pending{% endif %}">{{ i.get_status_display }}</span></td>
+                        <td>
+                            {% if i.status == 'issued' %}
+                            <a href="{% url 'book_return' i.pk %}" class="btn-success-erp btn-sm"><i class="fas fa-undo"></i></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center" style="padding:24px;color:var(--text-muted);">No issues</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
