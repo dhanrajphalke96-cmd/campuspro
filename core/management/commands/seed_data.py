@@ -3,7 +3,7 @@ from django.utils import timezone
 from datetime import date, timedelta
 import random
 
-from core.models import CustomUser, Department, Course, AcademicYear, Semester, Notification
+from core.models import CustomUser, Department, Course, AcademicYear, Semester, Notification, ENGINEERING_DEPARTMENT_CODES
 from students.models import StudentProfile, ParentDetail, AcademicHistory
 from attendance.models import Subject
 from fees.models import FeeStructure
@@ -18,6 +18,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write('Seeding database...\n')
 
+        # ─── Remove non-engineering departments ───
+        Department.objects.exclude(code__in=ENGINEERING_DEPARTMENT_CODES).delete()
+
         # ─── Academic Year & Semesters ───
         ay, _ = AcademicYear.objects.get_or_create(
             label='2025-26',
@@ -30,10 +33,10 @@ class Command(BaseCommand):
         # ─── Departments ───
         depts_data = [
             ('Computer Science', 'CS'),
-            ('Information Technology', 'IT'),
-            ('Commerce', 'COM'),
-            ('Management', 'MGT'),
-            ('Engineering', 'ENG'),
+            ('Electronics and Telecommunication', 'ENTC'),
+            ('Mechanical Engineering', 'ME'),
+            ('Civil Engineering', 'CE'),
+            ('Artificial Intelligence and Data Science', 'AIDS'),
         ]
         depts = {}
         for name, code in depts_data:
@@ -43,16 +46,11 @@ class Command(BaseCommand):
 
         # ─── Courses ───
         courses_data = [
-            ('BCA', 'BCA', 'CS', 'UG', 3, 6, 60),
-            ('BCS', 'BCS', 'CS', 'UG', 3, 6, 60),
-            ('MCA', 'MCA', 'CS', 'PG', 2, 4, 30),
-            ('B.Sc IT', 'BSCIT', 'IT', 'UG', 3, 6, 60),
-            ('M.Sc IT', 'MSCIT', 'IT', 'PG', 2, 4, 30),
-            ('BBA', 'BBA', 'MGT', 'UG', 3, 6, 60),
-            ('MBA', 'MBA', 'MGT', 'PG', 2, 4, 60),
-            ('B.Com', 'BCOM', 'COM', 'UG', 3, 6, 120),
-            ('M.Com', 'MCOM', 'COM', 'PG', 2, 4, 60),
-            ('B.Tech CS', 'BTCS', 'ENG', 'UG', 4, 8, 60),
+            ('B.Tech Computer Science', 'BT_CS', 'CS', 'UG', 4, 8, 60),
+            ('B.Tech Electronics and Telecommunication', 'BT_ENTC', 'ENTC', 'UG', 4, 8, 60),
+            ('B.Tech Mechanical Engineering', 'BT_ME', 'ME', 'UG', 4, 8, 60),
+            ('B.Tech Civil Engineering', 'BT_CE', 'CE', 'UG', 4, 8, 60),
+            ('B.Tech AI and Data Science', 'BT_AIDS', 'AIDS', 'UG', 4, 8, 60),
         ]
         courses = {}
         for name, code, dept_code, ctype, dur, sems, seats in courses_data:
@@ -92,8 +90,10 @@ class Command(BaseCommand):
         # ─── HODs ───
         hod_names = [
             ('hod_cs', 'Dr. Amit', 'Patel', 'CS'),
-            ('hod_it', 'Dr. Sunita', 'Deshmukh', 'IT'),
-            ('hod_com', 'Dr. Manoj', 'Kulkarni', 'COM'),
+            ('hod_entc', 'Dr. Sunita', 'Deshmukh', 'ENTC'),
+            ('hod_me', 'Dr. Manoj', 'Kulkarni', 'ME'),
+            ('hod_ce', 'Dr. Ramesh', 'Joshi', 'CE'),
+            ('hod_aids', 'Dr. Priya', 'Sharma', 'AIDS'),
         ]
         for uname, fname, lname, dept_code in hod_names:
             hod, created = CustomUser.objects.get_or_create(
@@ -110,9 +110,10 @@ class Command(BaseCommand):
         # ─── Faculty ───
         faculty_data = [
             ('faculty1', 'Priya', 'Joshi', 'CS'), ('faculty2', 'Rahul', 'Singh', 'CS'),
-            ('faculty3', 'Neha', 'Gupta', 'IT'), ('faculty4', 'Vikram', 'Mehta', 'IT'),
-            ('faculty5', 'Anjali', 'Patil', 'COM'), ('faculty6', 'Sanjay', 'Kumar', 'MGT'),
-            ('faculty7', 'Pooja', 'Reddy', 'ENG'), ('faculty8', 'Arjun', 'Nair', 'ENG'),
+            ('faculty3', 'Neha', 'Gupta', 'ENTC'), ('faculty4', 'Vikram', 'Mehta', 'ENTC'),
+            ('faculty5', 'Anjali', 'Patil', 'ME'), ('faculty6', 'Sanjay', 'Kumar', 'ME'),
+            ('faculty7', 'Pooja', 'Reddy', 'CE'), ('faculty8', 'Arjun', 'Nair', 'CE'),
+            ('faculty9', 'Rina', 'Kadam', 'AIDS'), ('faculty10', 'Amit', 'Desai', 'AIDS'),
         ]
         faculty_users = []
         for uname, fname, lname, dept_code in faculty_data:
@@ -138,7 +139,7 @@ class Command(BaseCommand):
                     'department': depts[dept_code],
                     'designation': designations[i % len(designations)],
                     'date_of_joining': date(2020, 1, 1) + timedelta(days=random.randint(0, 1000)),
-                    'qualification': random.choice(['Ph.D', 'M.Tech', 'M.Sc', 'MBA', 'M.Com']),
+                    'qualification': random.choice(['Ph.D', 'M.Tech', 'M.Sc']),
                     'experience_years': random.randint(2, 20),
                 }
             )
@@ -234,14 +235,15 @@ class Command(BaseCommand):
 
         # ─── Subjects ───
         subjects_data = [
-            ('Data Structures', 'CS301', 'CS', 3), ('DBMS', 'CS302', 'CS', 3),
-            ('Python Programming', 'CS201', 'CS', 2), ('Web Technology', 'CS401', 'CS', 4),
-            ('Operating Systems', 'CS303', 'CS', 3), ('Software Engineering', 'CS402', 'CS', 4),
-            ('Networking', 'IT301', 'IT', 3), ('Cyber Security', 'IT401', 'IT', 4),
-            ('Cloud Computing', 'IT402', 'IT', 4),
-            ('Accounting', 'COM201', 'COM', 2), ('Business Law', 'COM301', 'COM', 3),
-            ('Marketing', 'MGT301', 'MGT', 3), ('Finance', 'MGT302', 'MGT', 3),
-            ('Engineering Mathematics', 'ENG101', 'ENG', 1), ('Digital Electronics', 'ENG201', 'ENG', 2),
+            ('Engineering Mathematics I', 'CS101', 'CS', 1), ('Programming Fundamentals', 'CS102', 'CS', 1),
+            ('Data Structures', 'CS201', 'CS', 3), ('Operating Systems', 'CS301', 'CS', 5),
+            ('Digital Electronics', 'ENTC201', 'ENTC', 2), ('Analog Communication', 'ENTC301', 'ENTC', 3),
+            ('Microprocessors', 'ENTC401', 'ENTC', 7), ('Circuit Theory', 'ENTC101', 'ENTC', 1),
+            ('Engineering Mechanics', 'ME201', 'ME', 2), ('Thermodynamics', 'ME301', 'ME', 3),
+            ('Machine Design', 'ME401', 'ME', 7), ('Structural Analysis', 'CE201', 'CE', 2),
+            ('Fluid Mechanics', 'CE301', 'CE', 3), ('Reinforced Concrete Design', 'CE401', 'CE', 7),
+            ('Machine Learning', 'AIDS201', 'AIDS', 2), ('Deep Learning', 'AIDS301', 'AIDS', 3),
+            ('Data Science Fundamentals', 'AIDS101', 'AIDS', 1), ('Python for Data Science', 'AIDS102', 'AIDS', 1),
         ]
         for name, code, dept_code, sem in subjects_data:
             Subject.objects.get_or_create(
@@ -295,18 +297,18 @@ class Command(BaseCommand):
             ('Introduction to Algorithms', 'Cormen, Leiserson', '9780262033848', 'textbook', 'Computer Science'),
             ('Database System Concepts', 'Silberschatz', '9780078022159', 'textbook', 'Computer Science'),
             ('Operating System Concepts', 'Galvin', '9781119800361', 'textbook', 'Computer Science'),
-            ('Computer Networking', 'Kurose', '9780133594140', 'textbook', 'Networking'),
-            ('Python Crash Course', 'Eric Matthes', '9781593279288', 'textbook', 'Programming'),
+            ('Computer Networking', 'Kurose', '9780133594140', 'textbook', 'Electronics'),
+            ('Python Crash Course', 'Eric Matthes', '9781593279288', 'textbook', 'Computer Science'),
             ('Clean Code', 'Robert C. Martin', '9780132350884', 'reference', 'Software Engineering'),
             ('Design Patterns', 'Gang of Four', '9780201633610', 'reference', 'Software Engineering'),
-            ('Artificial Intelligence', 'Stuart Russell', '9780134610993', 'textbook', 'AI/ML'),
-            ('Financial Accounting', 'Tulsian', '9789352607266', 'textbook', 'Commerce'),
-            ('Marketing Management', 'Philip Kotler', '9789332587403', 'textbook', 'Management'),
-            ('Engineering Mathematics', 'B.S. Grewal', '9788174091154', 'textbook', 'Mathematics'),
-            ('Data Science from Scratch', 'Joel Grus', '9781492041139', 'reference', 'Data Science'),
+            ('Artificial Intelligence', 'Stuart Russell', '9780134610993', 'textbook', 'Artificial Intelligence'),
+            ('Engineering Economics', 'K. K. Dewett', '9788181312285', 'textbook', 'Engineering Economics'),
+            ('Engineering Management', 'S. Datta', '9780070666487', 'textbook', 'Engineering Management'),
+            ('Engineering Mathematics', 'B.S. Grewal', '9788174091154', 'textbook', 'Engineering Mathematics'),
             ('Digital Electronics', 'Morris Mano', '9780132774208', 'textbook', 'Electronics'),
-            ('Discrete Mathematics', 'Kenneth Rosen', '9780073383095', 'textbook', 'Mathematics'),
-            ('Web Development with Django', 'Ben Shaw', '9781801077521', 'reference', 'Web Development'),
+            ('Discrete Mathematics', 'Kenneth Rosen', '9780073383095', 'textbook', 'Engineering Mathematics'),
+            ('Applied Thermodynamics', 'R.K. Rajput', '9788121920450', 'textbook', 'Mechanical Engineering'),
+            ('Structural Analysis', 'R.C. Hibbeler', '9780134319650', 'textbook', 'Civil Engineering'),
         ]
         for title, author, isbn, cat, subj in books_data:
             copies = random.randint(3, 10)
@@ -334,7 +336,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('-' * 40))
         self.stdout.write(f'  Admin:      admin / admin123')
         self.stdout.write(f'  Principal:  principal / pass123')
-        self.stdout.write(f'  HOD:        hod_cs / pass123')
+        self.stdout.write(f'  HODs:       hod_cs / pass123, hod_entc / pass123, hod_me / pass123, hod_ce / pass123, hod_aids / pass123')
         self.stdout.write(f'  Faculty:    faculty1 / pass123')
         self.stdout.write(f'  Student:    student1 / pass123')
         self.stdout.write(f'  Accountant: accountant1 / pass123')

@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login — College ERP</title>
+    <title>Login — CampusPro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}?v=2" rel="stylesheet">
 </head>
 <body>
     <div class="login-wrapper">
@@ -52,7 +52,7 @@
 
                 <div class="text-center mt-4">
                     <small style="color: var(--text-muted);">
-                        <a href="#" class="text-decoration-none">Forgot Password?</a>
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none">Forgot Password?</a>
                     </small>
                 </div>
             </div>

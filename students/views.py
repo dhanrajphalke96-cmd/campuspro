@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db.models import Q
 from core.decorators import role_required
 from .models import StudentProfile, ParentDetail, AcademicHistory
+from core.models import ENGINEERING_DEPARTMENT_CODES
 
 
 @login_required
@@ -33,7 +34,7 @@ def student_list(request):
         students = students.filter(current_semester=semester)
 
     from core.models import Department
-    departments = Department.objects.filter(is_active=True)
+    departments = Department.objects.filter(is_active=True, code__in=ENGINEERING_DEPARTMENT_CODES)
     return render(request, 'students/list.html', {
         'students': students, 'departments': departments,
         'total': students.count()

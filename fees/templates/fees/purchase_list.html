@@ -1,0 +1,97 @@
+{% extends 'core/base.html' %}
+{% block title %}Purchase Records — College ERP{% endblock %}
+{% block page_title %}Purchase Records{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1" style="color: var(--text-primary);"><i class="fas fa-shopping-cart me-2 text-accent-blue"></i>Purchase Records</h4>
+            <p class="text-muted mb-0">Track and manage institution-wide purchase requests and approvals.</p>
+        </div>
+        {% if user.role == 'accountant' or user.role == 'admin' or user.is_superuser %}
+        <a href="{% url 'purchase_create' %}" class="btn-primary-erp"><i class="fas fa-plus me-2"></i>New Purchase Request</a>
+        {% endif %}
+    </div>
+
+    <div class="erp-card">
+        <h5 class="card-title-erp mb-3"><i class="fas fa-list me-2 text-accent-blue"></i>All Requests</h5>
+        <div class="table-responsive">
+            <table class="erp-table">
+                <thead>
+                    <tr>
+                        <th>Item Details</th>
+                        <th>Qty</th>
+                        <th>Est. Cost</th>
+                        <th>Requested By</th>
+                        <th>Status</th>
+                        <th>Approved By & Remarks</th>
+                        {% if user.role == 'principal' or user.role == 'admin' or user.is_superuser %}
+                        <th style="min-width: 320px;">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in purchases %}
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600; color: var(--text-primary);">{{ p.item_name }}</div>
+                            {% if p.description %}
+                            <small class="text-muted d-block" style="max-width: 250px;">{{ p.description }}</small>
+                            {% endif %}
+                        </td>
+                        <td style="font-weight: 500;">{{ p.quantity }}</td>
+                        <td style="font-weight: 600; color: var(--accent-green);">₹{{ p.estimated_cost|floatformat:2 }}</td>
+                        <td>
+                            <div style="font-weight: 500;">{{ p.requested_by.get_full_name|default:p.requested_by.username }}</div>
+                            <small class="text-muted">{{ p.created_at|date:"d M Y, h:i A" }}</small>
+                        </td>
+                        <td>
+                            <span class="badge-status {{ p.status }}">{{ p.get_status_display }}</span>
+                        </td>
+                        <td>
+                            {% if p.status != 'pending' %}
+                            <div style="font-weight: 500; color: var(--text-primary);">
+                                {{ p.approved_by.get_full_name|default:p.approved_by.username|default:"System" }}
+                            </div>
+                            {% if p.approval_remarks %}
+                            <small class="text-muted d-block" style="max-width: 200px;">"{{ p.approval_remarks }}"</small>
+                            {% else %}
+                            <small class="text-muted d-block">No remarks provided</small>
+                            {% endif %}
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        {% if user.role == 'principal' or user.role == 'admin' or user.is_superuser %}
+                        <td>
+                            {% if p.status == 'pending' %}
+                            <form method="post" class="d-flex align-items-center gap-2">
+                                {% csrf_token %}
+                                <input type="text" name="remarks" class="form-control form-control-sm" placeholder="Review remarks..." style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;">
+                                <button type="submit" class="btn btn-success btn-sm px-3" formaction="{% url 'purchase_approve' p.pk %}">
+                                    <i class="fas fa-check me-1"></i>Approve
+                                </button>
+                                <button type="submit" class="btn btn-danger btn-sm px-3" formaction="{% url 'purchase_reject' p.pk %}">
+                                    <i class="fas fa-times me-1"></i>Reject
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted"><i class="fas fa-lock me-1"></i>Reviewed</span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center" style="padding: 32px; color: var(--text-muted);">
+                            <i class="fas fa-inbox fa-2x mb-2 d-block"></i> No purchase records found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

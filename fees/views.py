@@ -82,3 +82,74 @@ def fees_history(request):
             Q(student__user__first_name__icontains=search)
         )
     return render(request, 'fees/history.html', {'payments': payments[:50]})
+
+
+from django.views.decorators.http import require_POST
+
+@login_required
+@role_required('admin', 'principal', 'accountant')
+def purchase_list(request):
+    from .models import PurchaseRecord
+    
+    role = 'admin' if request.user.is_superuser else request.user.role
+    if role == 'accountant':
+        purchases = PurchaseRecord.objects.filter(requested_by=request.user)
+    else: # Admin, Principal
+        purchases = PurchaseRecord.objects.all()
+        
+    return render(request, 'fees/purchase_list.html', {'purchases': purchases})
+
+
+@login_required
+@role_required('admin', 'accountant')
+def purchase_create(request):
+    from .models import PurchaseRecord
+    if request.method == 'POST':
+        item_name = request.POST.get('item_name')
+        quantity = request.POST.get('quantity')
+        estimated_cost = request.POST.get('estimated_cost')
+        description = request.POST.get('description', '')
+        
+        if item_name and quantity and estimated_cost:
+            PurchaseRecord.objects.create(
+                item_name=item_name,
+                quantity=quantity,
+                estimated_cost=estimated_cost,
+                description=description,
+                requested_by=request.user
+            )
+            messages.success(request, 'Purchase request submitted successfully.')
+            return redirect('purchase_list')
+        else:
+            messages.error(request, 'Please fill all required fields.')
+            
+    return render(request, 'fees/purchase_create.html')
+
+
+@login_required
+@role_required('admin', 'principal')
+@require_POST
+def purchase_approve(request, pk):
+    from .models import PurchaseRecord
+    purchase = get_object_or_404(PurchaseRecord, pk=pk)
+    purchase.status = 'approved'
+    purchase.approved_by = request.user
+    purchase.approval_remarks = request.POST.get('remarks', '')
+    purchase.save()
+    messages.success(request, f'Purchase request for "{purchase.item_name}" has been approved.')
+    return redirect('purchase_list')
+
+
+@login_required
+@role_required('admin', 'principal')
+@require_POST
+def purchase_reject(request, pk):
+    from .models import PurchaseRecord
+    purchase = get_object_or_404(PurchaseRecord, pk=pk)
+    purchase.status = 'rejected'
+    purchase.approved_by = request.user
+    purchase.approval_remarks = request.POST.get('remarks', '')
+    purchase.save()
+    messages.warning(request, f'Purchase request for "{purchase.item_name}" has been rejected.')
+    return redirect('purchase_list')
+

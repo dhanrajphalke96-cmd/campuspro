@@ -68,20 +68,33 @@ def leave_list(request):
 @login_required
 @role_required('admin', 'principal', 'hr', 'hod', 'faculty', 'accountant', 'librarian')
 def leave_apply(request):
-    if request.method == 'POST':
-        staff = StaffProfile.objects.get(user=request.user)
-        leave = LeaveRequest.objects.create(
-            staff=staff,
-            leave_type_id=request.POST['leave_type'],
-            from_date=request.POST['from_date'],
-            to_date=request.POST['to_date'],
-            reason=request.POST['reason'],
-        )
-        messages.success(request, 'Leave request submitted.')
+    # Ensure user has a StaffProfile
+    staff = StaffProfile.objects.filter(user=request.user).first()
+    if not staff:
+        messages.error(request, 'You do not have a Staff Profile set up yet. Please contact your administrator to create one before applying for leave.')
         return redirect('hrms_leave_list')
 
+    if request.method == 'POST':
+        from_date = request.POST.get('from_date')
+        to_date = request.POST.get('to_date')
+        leave_type_id = request.POST.get('leave_type')
+        reason = request.POST.get('reason')
+
+        if not all([from_date, to_date, leave_type_id, reason]):
+            messages.error(request, 'All fields are required.')
+        else:
+            LeaveRequest.objects.create(
+                staff=staff,
+                leave_type_id=leave_type_id,
+                from_date=from_date,
+                to_date=to_date,
+                reason=reason,
+            )
+            messages.success(request, 'Leave request submitted successfully.')
+            return redirect('hrms_leave_list')
+
     leave_types = LeaveType.objects.filter(is_active=True)
-    return render(request, 'hrms/leave_apply.html', {'leave_types': leave_types})
+    return render(request, 'hrms/leave_apply.html', {'leave_types': leave_types, 'staff': staff})
 
 
 @login_required

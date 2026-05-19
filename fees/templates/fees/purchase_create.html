@@ -1,0 +1,44 @@
+{% extends 'core/base.html' %}
+{% block title %}New Purchase Request — College ERP{% endblock %}
+{% block page_title %}New Purchase Request{% endblock %}
+
+{% block content %}
+<div class="fade-in" style="max-width: 800px; margin: 0 auto;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1" style="color: var(--text-primary);"><i class="fas fa-cart-plus me-2 text-accent-blue"></i>New Purchase Request</h4>
+            <p class="text-muted mb-0">Submit a new request for item purchase approval by the Principal.</p>
+        </div>
+        <a href="{% url 'purchase_list' %}" class="btn-outline-erp"><i class="fas fa-arrow-left me-2"></i>Back to List</a>
+    </div>
+
+    <div class="erp-card">
+        <h5 class="card-title-erp mb-3"><i class="fas fa-file-invoice-dollar me-2 text-accent-blue"></i>Request Details</h5>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label">Item Name / Title *</label>
+                    <input type="text" name="item_name" class="form-control" placeholder="e.g. Lab Computers, Classroom Projectors" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Quantity *</label>
+                    <input type="number" name="quantity" class="form-control" min="1" value="1" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Estimated Cost (₹) *</label>
+                    <input type="number" name="estimated_cost" class="form-control" min="0" step="0.01" placeholder="0.00" required>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Detailed Description / Justification</label>
+                    <textarea name="description" class="form-control" rows="4" placeholder="Describe what the purchase is for and why it is needed..."></textarea>
+                </div>
+                <div class="col-12 mt-4 d-flex gap-2">
+                    <button type="submit" class="btn-success-erp"><i class="fas fa-check-circle me-1"></i>Submit Request</button>
+                    <a href="{% url 'purchase_list' %}" class="btn-outline-erp">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

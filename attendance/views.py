@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.utils import timezone
 from .models import Subject, AttendanceSession, Attendance
 from students.models import StudentProfile
-from core.models import Department
+from core.models import Department, ENGINEERING_DEPARTMENT_CODES
 from core.decorators import role_required
 
 
@@ -40,7 +40,7 @@ def attendance_mark(request):
     else:
         subjects = Subject.objects.filter(is_active=True)
         
-    departments = Department.objects.filter(is_active=True)
+    departments = Department.objects.filter(is_active=True, code__in=ENGINEERING_DEPARTMENT_CODES)
     students = []
     selected_subject = None
 
@@ -111,7 +111,7 @@ def attendance_mark(request):
 @login_required
 @role_required('admin', 'principal', 'hod', 'faculty')
 def attendance_report(request):
-    departments = Department.objects.filter(is_active=True)
+    departments = Department.objects.filter(is_active=True, code__in=ENGINEERING_DEPARTMENT_CODES)
     if request.user.role == 'hod':
         dept = Department.objects.filter(hod=request.user).first()
         subjects = Subject.objects.filter(is_active=True, department=dept)

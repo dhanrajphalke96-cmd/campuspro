@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  font-feature-settings: 'cv02' 1, 'cv03' 1;
+}
+
+html {
+  min-height: 100%;
+  background: radial-gradient(circle at top left, rgba(97,218,251,0.12), transparent 22%),
+              radial-gradient(circle at top right, rgba(124,58,237,0.12), transparent 22%),
+              radial-gradient(circle at bottom left, rgba(34,211,238,0.08), transparent 18%),
+              radial-gradient(circle at bottom right, rgba(59,130,246,0.08), transparent 20%),
+              linear-gradient(180deg, #040814 0%, #050714 45%, #0b1229 100%);
+}
+
+body {
+  @apply bg-surface text-white antialiased;
+  background-image: inherit;
+  background-attachment: fixed;
+  min-height: 100%;
+}
+
+#root {
+  min-height: 100vh;
+  background: transparent;
+}
+
+input, button, select, textarea {
+  @apply bg-surface/90 border border-border text-white placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/50;
+  backdrop-filter: blur(16px);
+}
+
+button {
+  @apply transition;
+}
+
+* {
+  box-sizing: border-box;
+}

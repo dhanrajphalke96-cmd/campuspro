@@ -7,3 +7,7 @@ staticfiles/
 venv/
 env/
 .vscode/
+
+# Frontend artifacts
+frontend/node_modules/
+frontend/dist/

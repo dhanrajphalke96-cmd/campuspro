@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
+ENGINEERING_DEPARTMENT_CODES = ['CS', 'ENTC', 'ME', 'CE', 'AIDS']
+
 
 class CustomUser(AbstractUser):
     """Extended user with role-based access."""

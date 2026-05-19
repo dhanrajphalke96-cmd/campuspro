@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AdmissionApplication, AdmissionDocument, MeritList
+from .models import AdmissionApplication, AdmissionDocument, MeritList, AdmissionFeePayment
 
 class AdmissionApplicationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,4 +14,9 @@ class AdmissionDocumentSerializer(serializers.ModelSerializer):
 class MeritListSerializer(serializers.ModelSerializer):
     class Meta:
         model = MeritList
+        fields = '__all__'
+
+class AdmissionFeePaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AdmissionFeePayment
         fields = '__all__'

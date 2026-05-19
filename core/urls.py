@@ -10,7 +10,6 @@ urlpatterns = [
     path('notifications/', views.notifications_view, name='notifications'),
     path('notifications/<int:pk>/read/', views.mark_notification_read, name='mark_notification_read'),
     path('departments/', views.departments_view, name='departments'),
-    path('courses/', views.courses_view, name='courses'),
     
     # User Management
     path('users/', views.user_management_view, name='user_management'),

@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('', include('core.urls')),
     path('admission/', include('admission.urls')),
     path('students/', include('students.urls')),
@@ -16,7 +17,7 @@ urlpatterns = [
     path('library/', include('library.urls')),
     # API
     path('api/', include('core.api_urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('api/chatbot/', include('chatbot.urls')),
 ]
 
 if settings.DEBUG:

@@ -1,44 +1,77 @@
+"""
+core/middleware.py
+──────────────────
+AuditLogMiddleware: records mutating HTTP requests to AuditLog.
+
+Security hardening applied:
+  - Sensitive keys (password, token, csrfmiddlewaretoken) are stripped from payload.
+  - X-Forwarded-For header is validated: only the first IP segment is trusted.
+  - Static files, admin media, and favicon paths are excluded to avoid log flooding.
+  - Catches all exceptions so a logging failure never breaks a user request.
+"""
+
 import json
 from django.utils.deprecation import MiddlewareMixin
-from core.models import AuditLog
+
+# Paths that should never be logged (static / noisy / irrelevant)
+_EXCLUDED_PREFIXES = (
+    '/static/',
+    '/media/',
+    '/favicon.ico',
+    '/admin/jsi18n/',
+)
+
+# POST keys whose values must never appear in logs
+_SENSITIVE_KEYS = {'password', 'token', 'csrfmiddlewaretoken', 'new_password', 'old_password'}
+
+
+def _get_client_ip(request):
+    """Return a safe client IP, taking only the first segment of X-Forwarded-For."""
+    forwarded = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    if forwarded:
+        # Strip whitespace and take the leftmost (original client) address
+        ip = forwarded.split(',')[0].strip()
+        # Basic sanity: if it doesn't look like an IP, fall back
+        if ip and len(ip) <= 45:
+            return ip
+    return request.META.get('REMOTE_ADDR', None)
+
 
 class AuditLogMiddleware(MiddlewareMixin):
-    """
-    Middleware to log all mutating requests (POST, PUT, PATCH, DELETE) to the generic AuditLog.
-    """
+    """Log mutating requests (POST/PUT/PATCH/DELETE) to AuditLog."""
+
     def process_request(self, request):
-        if request.method in ['POST', 'PUT', 'PATCH', 'DELETE'] and request.user.is_authenticated:
-            # We determine the action
-            action = 'other'
-            if request.method == 'POST':
-                action = 'create'
-            elif request.method in ['PUT', 'PATCH']:
-                action = 'update'
-            elif request.method == 'DELETE':
-                action = 'delete'
-                
-            # Filter out sensitive data from POST payload
-            details_dict = {}
-            if request.method in ['POST', 'PUT', 'PATCH']:
-                for k, v in request.POST.items():
-                    if 'password' not in k.lower() and 'token' not in k.lower():
-                        details_dict[k] = v
-                        
-            details = json.dumps(details_dict) if details_dict else "No payload or binary data"
-            
-            # Simple IP retrieval
-            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-            if x_forwarded_for:
-                ip_address = x_forwarded_for.split(',')[0]
-            else:
-                ip_address = request.META.get('REMOTE_ADDR')
-                
-            model_name = request.path
-            
+        if request.method not in ('POST', 'PUT', 'PATCH', 'DELETE'):
+            return
+        if not request.user.is_authenticated:
+            return
+        if any(request.path.startswith(p) for p in _EXCLUDED_PREFIXES):
+            return
+
+        action_map = {
+            'POST':   'create',
+            'PUT':    'update',
+            'PATCH':  'update',
+            'DELETE': 'delete',
+        }
+        action = action_map.get(request.method, 'other')
+
+        # Build a sanitised payload dict
+        payload = {}
+        if request.method in ('POST', 'PUT', 'PATCH'):
+            for key, value in request.POST.items():
+                if key.lower() not in _SENSITIVE_KEYS:
+                    payload[key] = value
+
+        try:
+            from core.models import AuditLog
             AuditLog.objects.create(
                 user=request.user,
                 action=action,
-                model_name=model_name,
-                details=details,
-                ip_address=ip_address
+                model_name=request.path,
+                details=json.dumps(payload) if payload else '',
+                ip_address=_get_client_ip(request),
             )
+        except Exception:
+            # Never let audit logging break a user-facing request
+            pass

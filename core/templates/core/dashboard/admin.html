@@ -33,15 +33,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="stat-card orange">
-                <div class="stat-icon orange"><i class="fas fa-book-open"></i></div>
-                <div class="stat-info">
-                    <h3>{{ total_courses }}</h3>
-                    <p>Active Courses</p>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Charts Row -->
@@ -106,6 +97,13 @@
                             <div class="module-icon pink"><i class="fas fa-book"></i></div>
                             <h4>Library</h4>
                             <p>Book management</p>
+                        </a>
+                    </div>
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'chatbot_page' %}" class="module-card red d-block text-decoration-none">
+                            <div class="module-icon red"><i class="fas fa-robot"></i></div>
+                            <h4>AI Assistant</h4>
+                            <p>Chat with AI</p>
                         </a>
                     </div>
                 </div>

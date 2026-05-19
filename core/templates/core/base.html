@@ -13,7 +13,7 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <!-- Custom CSS -->
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}?v=2" rel="stylesheet">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -48,18 +48,12 @@
                         <span class="nav-text">Departments</span>
                     </a>
                 </div>
-                <div class="nav-item">
-                    <a href="{% url 'courses' %}" class="nav-link" id="nav-courses">
-                        <i class="fas fa-book-open"></i>
-                        <span class="nav-text">Courses</span>
-                    </a>
-                </div>
                 {% endif %}
 
-                {% if user.role in 'admin,principal,hod,faculty,student' or user.is_superuser %}
+                {% if user.role == 'admin' or user.role == 'principal' or user.role == 'hod' or user.role == 'faculty' or user.role == 'student' or user.is_superuser %}
                 <div class="menu-header">Academic</div>
                 
-                {% if user.role in 'admin,principal' or user.is_superuser %}
+                {% if user.role == 'admin' or user.role == 'principal' or user.is_superuser %}
                 <div class="nav-item">
                     <a href="{% url 'admission_list' %}" class="nav-link" id="nav-admission">
                         <i class="fas fa-user-plus"></i>
@@ -68,7 +62,7 @@
                 </div>
                 {% endif %}
                 
-                {% if user.role in 'admin,principal,hod,faculty' or user.is_superuser %}
+                {% if user.role == 'admin' or user.role == 'principal' or user.role == 'hod' or user.role == 'faculty' or user.is_superuser %}
                 <div class="nav-item">
                     <a href="{% url 'student_list' %}" class="nav-link" id="nav-students">
                         <i class="fas fa-users"></i>
@@ -91,7 +85,7 @@
                 </div>
                 {% endif %}
 
-                {% if user.role in 'admin,principal,accountant,student' or user.is_superuser %}
+                {% if user.role == 'admin' or user.role == 'principal' or user.role == 'accountant' or user.role == 'student' or user.is_superuser %}
                 <div class="menu-header">Finance</div>
                 <div class="nav-item">
                     <a href="{% url 'fees_dashboard' %}" class="nav-link" id="nav-fees">
@@ -101,7 +95,7 @@
                 </div>
                 {% endif %}
 
-                {% if user.role in 'admin,principal,hr,accountant' or user.is_superuser %}
+                {% if user.role == 'admin' or user.role == 'principal' or user.role == 'hr' or user.role == 'accountant' or user.is_superuser %}
                 <div class="nav-item">
                     <a href="{% url 'payroll_dashboard' %}" class="nav-link" id="nav-payroll">
                         <i class="fas fa-money-check-alt"></i>
@@ -110,10 +104,19 @@
                 </div>
                 {% endif %}
 
+                {% if user.role == 'admin' or user.role == 'principal' or user.role == 'accountant' or user.is_superuser %}
+                <div class="nav-item">
+                    <a href="{% url 'purchase_list' %}" class="nav-link" id="nav-purchase">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="nav-text">Purchase Records</span>
+                    </a>
+                </div>
+                {% endif %}
+
                 {% if user.role != 'student' %}
                 <div class="menu-header">HR & Leaves</div>
                 
-                {% if user.role in 'admin,principal,hr' or user.is_superuser %}
+                {% if user.role == 'admin' or user.role == 'principal' or user.role == 'hr' or user.is_superuser %}
                 <div class="nav-item">
                     <a href="{% url 'hrms_dashboard' %}" class="nav-link" id="nav-hrms">
                         <i class="fas fa-user-tie"></i>
@@ -130,7 +133,7 @@
                 {% endif %}
                 {% endif %}
 
-                {% if user.role in 'admin,principal,librarian' or user.is_superuser %}
+                {% if user.role == 'admin' or user.role == 'principal' or user.role == 'librarian' or user.is_superuser %}
                 <div class="menu-header">Resources</div>
                 <div class="nav-item">
                     <a href="{% url 'library_dashboard' %}" class="nav-link" id="nav-library">
@@ -175,9 +178,12 @@
                     <a href="{% url 'profile' %}" class="topbar-btn" id="btn-profile">
                         <i class="fas fa-user-circle"></i>
                     </a>
-                    <a href="{% url 'logout' %}" class="topbar-btn" id="btn-logout" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </a>
+                    <form method="post" action="{% url 'logout' %}" style="display:inline;" id="logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="topbar-btn" id="btn-logout" title="Logout" style="background:none;border:none;cursor:pointer;padding:0;">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
 
@@ -200,6 +206,289 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Floating Chatbot Widget -->
+    <div id="chatbot-widget" class="floating-chatbot">
+        <!-- Chatbot Toggle Button -->
+        <div id="chatbot-toggle" class="chatbot-toggle">
+            <i class="fas fa-robot"></i>
+        </div>
+
+        <!-- Chatbot Container -->
+        <div id="chatbot-container" class="chatbot-container" style="display: none;">
+            <div class="chatbot-header">
+                <h6>AI Assistant</h6>
+                <button id="chatbot-close" class="btn-close" type="button"></button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages"></div>
+            <div class="chatbot-input-area">
+                <input type="text" id="chatbot-input" class="form-control" placeholder="Ask me anything...">
+                <button id="chatbot-send" class="btn btn-sm btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .floating-chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 24px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .chatbot-container {
+            position: absolute;
+            bottom: 90px;
+            right: 0;
+            width: 380px;
+            height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 40px rgba(0, 0, 0, 0.16);
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .chatbot-header .btn-close {
+            background: white;
+            opacity: 0.7;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f8f9fa;
+        }
+
+        .chatbot-message {
+            padding: 10px 14px;
+            border-radius: 8px;
+            max-width: 80%;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .chatbot-message.user {
+            align-self: flex-end;
+            background: #667eea;
+            color: white;
+        }
+
+        .chatbot-message.assistant {
+            align-self: flex-start;
+            background: white;
+            border: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        .chatbot-message.welcome {
+            align-self: flex-start;
+            background: white;
+            border: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .chatbot-input-area {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .chatbot-input-area input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 8px 14px;
+            font-size: 14px;
+        }
+
+        .chatbot-input-area button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 480px) {
+            .chatbot-container {
+                width: 100vw;
+                height: 100vh;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
+            }
+
+            .chatbot-message {
+                max-width: 90%;
+            }
+        }
+    </style>
+
+    <script>
+        const chatbotToggle = document.getElementById('chatbot-toggle');
+        const chatbotContainer = document.getElementById('chatbot-container');
+        const chatbotClose = document.getElementById('chatbot-close');
+        const chatbotInput = document.getElementById('chatbot-input');
+        const chatbotSend = document.getElementById('chatbot-send');
+        const chatbotMessages = document.getElementById('chatbot-messages');
+        let sessionId = null;
+
+        // Show welcome message on first load
+        function showWelcomeMessage() {
+            const welcomeMsg = document.createElement('div');
+            welcomeMsg.className = 'chatbot-message welcome';
+            welcomeMsg.textContent = 'Hello! 👋 I\'m your AI Assistant. How can I help you today?';
+            chatbotMessages.appendChild(welcomeMsg);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        // Toggle chatbot
+        chatbotToggle.addEventListener('click', () => {
+            if (chatbotContainer.style.display === 'none') {
+                chatbotContainer.style.display = 'flex';
+                if (chatbotMessages.children.length === 0) {
+                    showWelcomeMessage();
+                }
+                chatbotInput.focus();
+            } else {
+                chatbotContainer.style.display = 'none';
+            }
+        });
+
+        chatbotClose.addEventListener('click', () => {
+            chatbotContainer.style.display = 'none';
+        });
+
+        function addMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chatbot-message ${role}`;
+            messageDiv.textContent = content;
+            chatbotMessages.appendChild(messageDiv);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        async function sendMessage() {
+            const message = chatbotInput.value.trim();
+            if (!message) return;
+
+            addMessage('user', message);
+            chatbotInput.value = '';
+            chatbotSend.disabled = true;
+
+            try {
+                const response = await fetch('{% url "chatbot-message" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        session_id: sessionId,
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addMessage('assistant', data.reply);
+                    sessionId = data.session_id;
+                } else {
+                    const error = await response.json();
+                    addMessage('assistant', `Error: ${error.detail || 'Unable to get response'}`);
+                }
+            } catch (error) {
+                addMessage('assistant', `Error: ${error.message}`);
+            } finally {
+                chatbotSend.disabled = false;
+                chatbotInput.focus();
+            }
+        }
+
+        chatbotSend.addEventListener('click', sendMessage);
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+
     <!-- Custom JS -->
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}

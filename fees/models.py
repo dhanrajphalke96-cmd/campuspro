@@ -113,3 +113,28 @@ class FeeReminder(models.Model):
 
     def __str__(self):
         return f"Reminder for {self.student.enrollment_no}"
+
+
+class PurchaseRecord(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    item_name = models.CharField(max_length=200)
+    quantity = models.PositiveIntegerField(default=1)
+    estimated_cost = models.DecimalField(max_digits=12, decimal_places=2)
+    description = models.TextField(blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    requested_by = models.ForeignKey('core.CustomUser', on_delete=models.CASCADE, related_name='purchase_requests')
+    approved_by = models.ForeignKey('core.CustomUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_purchases')
+    approval_remarks = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.item_name} ({self.quantity}) - {self.status}"
+
