@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ title }} — CampusPro{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card max-width-card mx-auto" style="max-width: 600px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0"><i class="fas fa-cog me-2 text-accent-blue"></i>{{ title }}</h5>
+            <a href="{% url 'leave_type_list' %}" class="btn-outline-erp btn-sm"><i class="fas fa-arrow-left"></i> Back to Policies</a>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label class="form-label">Policy Name <span class="text-danger">*</span></label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <div class="text-danger mt-1 small">{{ form.name.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Maximum Days Per Year <span class="text-danger">*</span></label>
+                {{ form.max_days_per_year }}
+                {% if form.max_days_per_year.errors %}
+                    <div class="text-danger mt-1 small">{{ form.max_days_per_year.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-4 d-flex align-items-center gap-2">
+                {{ form.is_active }}
+                <label class="form-check-label mb-0" for="{{ form.is_active.id_for_label }}" style="font-size:14px;cursor:pointer;">Active Policy (Staff can apply for this leave type)</label>
+                {% if form.is_active.errors %}
+                    <div class="text-danger mt-1 small">{{ form.is_active.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-primary-erp">
+                    <i class="fas fa-save me-2"></i> Save Policy
+                </button>
+                <a href="{% url 'leave_type_list' %}" class="btn-outline-erp">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

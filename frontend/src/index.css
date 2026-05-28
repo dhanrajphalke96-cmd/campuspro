@@ -9,11 +9,11 @@
 
 html {
   min-height: 100%;
-  background: radial-gradient(circle at top left, rgba(97,218,251,0.12), transparent 22%),
-              radial-gradient(circle at top right, rgba(124,58,237,0.12), transparent 22%),
-              radial-gradient(circle at bottom left, rgba(34,211,238,0.08), transparent 18%),
-              radial-gradient(circle at bottom right, rgba(59,130,246,0.08), transparent 20%),
-              linear-gradient(180deg, #040814 0%, #050714 45%, #0b1229 100%);
+  background: radial-gradient(circle at top left, rgba(20, 184, 166, 0.18), transparent 18%),
+              radial-gradient(circle at top right, rgba(28, 214, 171, 0.14), transparent 16%),
+              radial-gradient(circle at bottom left, rgba(250, 232, 196, 0.12), transparent 24%),
+              radial-gradient(circle at bottom right, rgba(16, 185, 166, 0.10), transparent 20%),
+              linear-gradient(180deg, #061918 0%, #081f1d 42%, #0f2f26 100%);
 }
 
 body {

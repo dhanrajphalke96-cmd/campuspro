@@ -19,6 +19,7 @@ class Exam(models.Model):
     end_time = models.TimeField(null=True, blank=True)
     total_marks = models.IntegerField(default=100)
     passing_marks = models.IntegerField(default=40)
+    is_moderated = models.BooleanField(default=False)
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

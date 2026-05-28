@@ -30,6 +30,10 @@ def marks_entry(request, pk):
     if exam.is_published:
         messages.error(request, "Cannot enter marks for an already published exam.")
         return redirect('exam_detail', pk=pk)
+        
+    if getattr(exam, 'is_moderated', False):
+        messages.error(request, "Marks have been moderated by the HOD and are locked from further editing.")
+        return redirect('exam_detail', pk=pk)
     from students.models import StudentProfile
     students = StudentProfile.objects.filter(
         department=exam.subject.department,
@@ -64,3 +68,23 @@ def marks_entry(request, pk):
 def result_list(request):
     results = Result.objects.filter(is_published=True).select_related('student__user', 'academic_year').order_by('-academic_year__start_date', 'semester')
     return render(request, 'examination/results.html', {'results': results})
+
+@login_required
+@role_required('hod', 'admin')
+def moderate_marks(request, pk):
+    exam = get_object_or_404(Exam, pk=pk)
+    if request.user.role == 'hod' and exam.subject.department.hod != request.user:
+        messages.error(request, "You can only moderate exams for your own department.")
+        return redirect('exam_detail', pk=pk)
+        
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'approve':
+            exam.is_moderated = True
+            exam.save(update_fields=['is_moderated'])
+            messages.success(request, f"Marks for {exam.name} have been moderated and finalized.")
+        elif action == 'unlock':
+            exam.is_moderated = False
+            exam.save(update_fields=['is_moderated'])
+            messages.warning(request, f"Marks for {exam.name} have been unlocked for editing.")
+    return redirect('exam_detail', pk=pk)

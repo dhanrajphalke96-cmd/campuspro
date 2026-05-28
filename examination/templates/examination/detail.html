@@ -11,6 +11,31 @@
             <div class="col-md-3"><small class="text-muted">Date</small><div>{{ exam.date|date:"d M Y" }}</div></div>
             <div class="col-md-3"><small class="text-muted">Total / Pass</small><div>{{ exam.total_marks }} / {{ exam.passing_marks }}</div></div>
         </div>
+        
+        <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+            <div>
+                {% if exam.is_moderated %}
+                    <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Moderated</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>Pending Moderation</span>
+                {% endif %}
+            </div>
+            <div>
+                {% if request.user.role == 'hod' and exam.subject.department.hod == request.user %}
+                    <form action="{% url 'moderate_marks' exam.pk %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        {% if not exam.is_moderated %}
+                            <button type="submit" name="action" value="approve" class="btn btn-sm btn-success"><i class="fas fa-check me-2"></i>Approve & Finalize Marks</button>
+                        {% else %}
+                            <button type="submit" name="action" value="unlock" class="btn btn-sm btn-outline-warning"><i class="fas fa-unlock me-2"></i>Unlock for Editing</button>
+                        {% endif %}
+                    </form>
+                {% endif %}
+                {% if request.user.role == 'faculty' and not exam.is_moderated %}
+                    <a href="{% url 'marks_entry' exam.pk %}" class="btn btn-sm btn-primary ms-2"><i class="fas fa-edit me-2"></i>Enter/Edit Marks</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <div class="erp-card">

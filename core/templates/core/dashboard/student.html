@@ -6,27 +6,39 @@
 <div class="fade-in">
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-md-6">
-            <div class="stat-card blue">
-                <div class="stat-icon blue"><i class="fas fa-percentage"></i></div>
-                <div class="stat-info"><h3>—</h3><p>Attendance %</p></div>
+            <div class="stat-card {% if attendance_percentage and attendance_percentage < 75 %}red{% else %}blue{% endif %}">
+                <div class="stat-icon {% if attendance_percentage and attendance_percentage < 75 %}red{% else %}blue{% endif %}"><i class="fas fa-percentage"></i></div>
+                <div class="stat-info">
+                    <h3>{% if attendance_percentage %}{{ attendance_percentage }}%{% else %}—{% endif %}</h3>
+                    <p>Attendance %</p>
+                </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
             <div class="stat-card green">
                 <div class="stat-icon green"><i class="fas fa-chart-line"></i></div>
-                <div class="stat-info"><h3>—</h3><p>Current CGPA</p></div>
+                <div class="stat-info">
+                    <h3>{% if cgpa %}{{ cgpa }}{% else %}—{% endif %}</h3>
+                    <p>Current CGPA</p>
+                </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
             <div class="stat-card orange">
                 <div class="stat-icon orange"><i class="fas fa-rupee-sign"></i></div>
-                <div class="stat-info"><h3>—</h3><p>Pending Fees</p></div>
+                <div class="stat-info">
+                    <h3>₹{{ pending_fees|floatformat:0 }}</h3>
+                    <p>Pending Fees</p>
+                </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
             <div class="stat-card purple">
                 <div class="stat-icon purple"><i class="fas fa-book"></i></div>
-                <div class="stat-info"><h3>—</h3><p>Books Issued</p></div>
+                <div class="stat-info">
+                    <h3>{{ books_issued }}</h3>
+                    <p>Books Issued</p>
+                </div>
             </div>
         </div>
     </div>

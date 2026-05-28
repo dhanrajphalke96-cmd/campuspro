@@ -95,6 +95,10 @@ def dashboard_view(request):
         context['dept_counts'] = [d['student_count'] for d in dept_data]
 
     elif role == 'hod':
+        from examination.models import Result
+        from attendance.models import Attendance
+        from students.models import StudentProfile
+
         hod_dept = Department.objects.filter(hod=user).first()
         context['hod_dept'] = hod_dept
         if hod_dept:
@@ -104,15 +108,77 @@ def dashboard_view(request):
             context['total_faculty'] = CustomUser.objects.filter(
                 role='faculty', staff_profile__department=hod_dept
             ).count()
+            
+            # Performance Analytics
+            results = Result.objects.filter(student__department=hod_dept)
+            total_results = results.count()
+            passed_results = results.filter(status='pass').count()
+            context['pass_percentage'] = round((passed_results / total_results * 100), 1) if total_results > 0 else 0
+            context['top_performers'] = results.order_by('-percentage')[:5]
+
+            # Low Attendance Alerts
+            students = StudentProfile.objects.filter(department=hod_dept, is_active=True).select_related('user')
+            low_attendance_students = []
+            for student in students:
+                total_classes = Attendance.objects.filter(student=student).count()
+                if total_classes > 0:
+                    present_classes = Attendance.objects.filter(student=student, status__in=['present', 'late']).count()
+                    perc = (present_classes / total_classes) * 100
+                    if perc < 75.0:
+                        low_attendance_students.append({
+                            'student': student,
+                            'percentage': round(perc, 1)
+                        })
+            low_attendance_students.sort(key=lambda x: x['percentage'])
+            context['low_attendance_students'] = low_attendance_students[:10]
+            
         else:
             context['total_students'] = 0
             context['total_faculty'] = 0
+            context['pass_percentage'] = 0
+            context['top_performers'] = []
+            context['low_attendance_students'] = []
 
     elif role == 'faculty':
         context['total_subjects'] = user.assigned_subjects.filter(is_active=True).count()
 
     elif role == 'student':
-        context['profile'] = getattr(user, 'student_profile', None)
+        from students.models import StudentProfile, AcademicHistory
+        from attendance.models import Attendance
+        from fees.models import FeePayment
+        from library.models import BookIssue
+
+        student_profile = getattr(user, 'student_profile', None)
+        context['profile'] = student_profile
+
+        if student_profile:
+            # 1. Attendance %
+            total_classes = Attendance.objects.filter(student=student_profile).count()
+            if total_classes > 0:
+                present_classes = Attendance.objects.filter(student=student_profile, status__in=['present', 'late']).count()
+                context['attendance_percentage'] = round((present_classes / total_classes) * 100, 1)
+            else:
+                context['attendance_percentage'] = None
+
+            # 2. CGPA
+            latest_history = AcademicHistory.objects.filter(student=student_profile).order_by('-semester').first()
+            if latest_history and latest_history.cgpa:
+                context['cgpa'] = latest_history.cgpa
+            else:
+                context['cgpa'] = None
+
+            # 3. Pending Fees
+            pending_amount = FeePayment.objects.filter(student=student_profile, status='pending').aggregate(total=Sum('amount_paid'))['total'] or 0
+            context['pending_fees'] = pending_amount
+
+            # 4. Books Issued
+            issued_count = BookIssue.objects.filter(student=student_profile, status__in=['issued', 'overdue']).count()
+            context['books_issued'] = issued_count
+        else:
+            context['attendance_percentage'] = None
+            context['cgpa'] = None
+            context['pending_fees'] = 0
+            context['books_issued'] = 0
 
     elif role == 'accountant':
         context['total_collected'] = (

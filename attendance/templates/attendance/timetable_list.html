@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+{% block title %}Timetables — College ERP{% endblock %}
+{% block page_title %}Timetable Approvals{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card">
+        <h5 class="mb-3"><i class="fas fa-calendar-week me-2 text-accent-blue"></i>Department Timetables</h5>
+        
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Department</th>
+                        <th>Semester</th>
+                        <th>Division</th>
+                        <th>Created By</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tt in timetables %}
+                    <tr>
+                        <td><strong>{{ tt.department.code }}</strong></td>
+                        <td>Sem {{ tt.semester }}</td>
+                        <td>Div {{ tt.division }}</td>
+                        <td>{{ tt.created_by.get_full_name|default:tt.created_by.username }}</td>
+                        <td>
+                            {% if tt.status == 'approved' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% elif tt.status == 'rejected' %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% elif tt.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Draft</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if request.user.role == 'hod' and tt.status == 'pending' %}
+                            <form action="{% url 'timetable_approve' tt.pk %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="approve" class="btn btn-sm btn-success" title="Approve"><i class="fas fa-check"></i></button>
+                                <button type="submit" name="action" value="reject" class="btn btn-sm btn-danger" title="Reject"><i class="fas fa-times"></i></button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-sm btn-outline-secondary" disabled>No Actions</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No timetables found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

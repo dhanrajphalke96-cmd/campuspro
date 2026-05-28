@@ -244,7 +244,7 @@ export default function AdmissionPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-2xl bg-accent px-5 py-3 text-sm font-semibold text-surface transition hover:bg-violet-400 disabled:opacity-70"
+              className="rounded-2xl bg-accent px-5 py-3 text-sm font-semibold text-surface transition hover:bg-accent/90 disabled:opacity-70"
             >
               {submitting ? 'Submitting...' : 'Submit Application'}
             </button>

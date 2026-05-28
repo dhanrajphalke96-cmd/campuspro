@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <h2>Assign Subjects — {{ department.name }}</h2>
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" style="margin-bottom:1rem;">
+    {% csrf_token %}
+    <div>
+      <label for="subject">Subject</label>
+      <select name="subject" id="subject">
+        <option value="">-- Select --</option>
+        {% for s in subjects %}
+          <option value="{{ s.pk }}">{{ s.code }} — {{ s.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="staff">Staff</label>
+      <select name="staff" id="staff">
+        <option value="">-- Select --</option>
+        {% for sp in staff_members %}
+          <option value="{{ sp.pk }}">{{ sp.user.get_full_name }} ({{ sp.employee_id }})</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit">Assign</button>
+  </form>
+
+  <h3>Current Assignments</h3>
+  <table>
+    <thead><tr><th>Subject</th><th>Assigned Faculty</th></tr></thead>
+    <tbody>
+      {% for s in subjects %}
+        <tr>
+          <td>{{ s.code }} — {{ s.name }}</td>
+          <td>
+            {% for f in s.assigned_faculty.all %}
+              {{ f.get_full_name }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              <em>Unassigned</em>
+            {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

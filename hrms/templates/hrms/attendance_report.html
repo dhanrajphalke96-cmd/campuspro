@@ -1,0 +1,96 @@
+{% extends 'core/base.html' %}
+{% block title %}Staff Attendance Report — CampusPro{% endblock %}
+{% block page_title %}Staff Attendance Report{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- Filter Card -->
+    <div class="erp-card mb-4">
+        <h5 class="mb-3"><i class="fas fa-filter me-2 text-accent-blue"></i>Filter Attendance Logs</h5>
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label" style="font-size: 13px;">Date</label>
+                <input type="date" name="date" class="form-control" value="{{ selected_date|default:'' }}" style="background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-color);">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" style="font-size: 13px;">Department</label>
+                <select name="department" class="form-control" style="background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-color);">
+                    <option value="">All Departments</option>
+                    {% for d in departments %}
+                        <option value="{{ d.id }}" {% if selected_department == d.id %}selected{% endif %}>{{ d.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" style="font-size: 13px;">Staff Member</label>
+                <select name="staff" class="form-control" style="background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-color);">
+                    <option value="">All Staff</option>
+                    {% for s in staff_members %}
+                        <option value="{{ s.id }}" {% if selected_staff == s.id %}selected{% endif %}>{{ s.user.get_full_name }} ({{ s.employee_id }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="submit" class="btn-primary-erp w-100 py-2"><i class="fas fa-search me-1"></i> Search Logs</button>
+                <a href="{% url 'attendance_report' %}" class="btn-outline-erp w-100 py-2 text-center text-decoration-none" style="line-height: normal;"><i class="fas fa-undo me-1"></i> Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Card -->
+    <div class="erp-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0 text-accent-blue" style="font-weight:600;">Attendance Log (Showing last 100 entries)</h6>
+            <a href="{% url 'attendance_record' %}" class="btn-outline-erp btn-sm"><i class="fas fa-plus me-1"></i> Record Daily Sheet</a>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="erp-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Emp ID</th>
+                        <th>Staff Name</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in attendance_list %}
+                    <tr>
+                        <td style="font-weight: 500;">{{ log.date|date:"d M Y" }}</td>
+                        <td style="font-weight: 600; color: var(--accent-blue);">{{ log.staff.employee_id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--gradient-purple); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">
+                                    {% if log.staff.user.first_name %}{{ log.staff.user.first_name.0 }}{% else %}{{ log.staff.user.username.0|upper }}{% endif %}
+                                </div>
+                                <span style="font-weight: 500;">{{ log.staff.user.get_full_name }}</span>
+                            </div>
+                        </td>
+                        <td>{{ log.staff.department.name|default:"—" }}</td>
+                        <td><span class="badge-status info" style="font-size:11px;">{{ log.staff.get_designation_display }}</span></td>
+                        <td class="text-center">
+                            {% if log.status == 'present' %}
+                                <span class="badge-status approved" style="font-size:11px; padding: 4px 10px;"><i class="fas fa-check-circle me-1"></i> Present</span>
+                            {% elif log.status == 'absent' %}
+                                <span class="badge-status rejected" style="font-size:11px; padding: 4px 10px;"><i class="fas fa-times-circle me-1"></i> Absent</span>
+                            {% elif log.status == 'half_day' %}
+                                <span class="badge-status warning" style="font-size:11px; padding: 4px 10px;"><i class="fas fa-adjust me-1"></i> Half Day</span>
+                            {% elif log.status == 'on_leave' %}
+                                <span class="badge-status orange" style="font-size:11px; padding: 4px 10px;"><i class="fas fa-plane me-1"></i> On Leave</span>
+                            {% else %}
+                                <span class="badge-status info" style="font-size:11px; padding: 4px 10px;">{{ log.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center" style="padding:32px; color:var(--text-muted);"><i class="fas fa-info-circle mb-2 d-block" style="font-size: 24px;"></i>No attendance records found matching filters.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

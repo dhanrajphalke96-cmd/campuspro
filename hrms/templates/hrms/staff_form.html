@@ -1,0 +1,146 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ title }} — CampusPro{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card max-width-card mx-auto">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0"><i class="fas fa-user-plus me-2 text-accent-blue"></i>{{ title }}</h5>
+            <a href="{% url 'hrms_dashboard' %}" class="btn-outline-erp btn-sm"><i class="fas fa-arrow-left"></i> Back to Directory</a>
+        </div>
+        
+        <form method="post" id="staff-form">
+            {% csrf_token %}
+            
+            <h6 class="text-accent-blue mb-3 border-bottom pb-2" style="font-weight: 600;">User Account Details</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Username <span class="text-danger">*</span></label>
+                    {{ user_form.username }}
+                    {% if user_form.username.errors %}
+                        <div class="text-danger mt-1 small">{{ user_form.username.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Password {% if not user_form.instance.pk %}<span class="text-danger">*</span>{% endif %}</label>
+                    {{ user_form.password }}
+                    <small class="text-muted d-block mt-1">{{ user_form.password.help_text }}</small>
+                    {% if user_form.password.errors %}
+                        <div class="text-danger mt-1 small">{{ user_form.password.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">First Name <span class="text-danger">*</span></label>
+                    {{ user_form.first_name }}
+                    {% if user_form.first_name.errors %}
+                        <div class="text-danger mt-1 small">{{ user_form.first_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                    {{ user_form.last_name }}
+                    {% if user_form.last_name.errors %}
+                        <div class="text-danger mt-1 small">{{ user_form.last_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    {{ user_form.email }}
+                    {% if user_form.email.errors %}
+                        <div class="text-danger mt-1 small">{{ user_form.email.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Phone</label>
+                    {{ user_form.phone }}
+                    {% if user_form.phone.errors %}
+                        <div class="text-danger mt-1 small">{{ user_form.phone.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Date of Birth</label>
+                    {{ user_form.date_of_birth }}
+                    {% if user_form.date_of_birth.errors %}
+                        <div class="text-danger mt-1 small">{{ user_form.date_of_birth.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">System Role <span class="text-danger">*</span></label>
+                    {{ user_form.role }}
+                    {% if user_form.role.errors %}
+                        <div class="text-danger mt-1 small">{{ user_form.role.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Address</label>
+                    {{ user_form.address }}
+                    {% if user_form.address.errors %}
+                        <div class="text-danger mt-1 small">{{ user_form.address.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h6 class="text-accent-blue mb-3 border-bottom pb-2" style="font-weight: 600;">Academic & Designation Details</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Employee ID <span class="text-danger">*</span></label>
+                    {{ profile_form.employee_id }}
+                    {% if profile_form.employee_id.errors %}
+                        <div class="text-danger mt-1 small">{{ profile_form.employee_id.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Department <span class="text-danger">*</span></label>
+                    {{ profile_form.department }}
+                    {% if profile_form.department.errors %}
+                        <div class="text-danger mt-1 small">{{ profile_form.department.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Designation <span class="text-danger">*</span></label>
+                    {{ profile_form.designation }}
+                    {% if profile_form.designation.errors %}
+                        <div class="text-danger mt-1 small">{{ profile_form.designation.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Date of Joining <span class="text-danger">*</span></label>
+                    {{ profile_form.date_of_joining }}
+                    {% if profile_form.date_of_joining.errors %}
+                        <div class="text-danger mt-1 small">{{ profile_form.date_of_joining.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Qualification</label>
+                    {{ profile_form.qualification }}
+                    {% if profile_form.qualification.errors %}
+                        <div class="text-danger mt-1 small">{{ profile_form.qualification.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Years of Experience</label>
+                    {{ profile_form.experience_years }}
+                    {% if profile_form.experience_years.errors %}
+                        <div class="text-danger mt-1 small">{{ profile_form.experience_years.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Area of Specialization</label>
+                    {{ profile_form.specialization }}
+                    {% if profile_form.specialization.errors %}
+                        <div class="text-danger mt-1 small">{{ profile_form.specialization.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-primary-erp" id="save-staff-btn">
+                    <i class="fas fa-save me-2"></i> Save Staff Member
+                </button>
+                <a href="{% url 'hrms_dashboard' %}" class="btn-outline-erp">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

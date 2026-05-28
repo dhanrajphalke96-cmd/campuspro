@@ -20,18 +20,22 @@
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Date</label>
-                    <input type="date" name="date" class="form-control" value="{{ today }}" required>
+                    <input type="date" name="date" class="form-control" value="{{ selected_date }}" required>
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Division</label>
                     <select name="division" class="form-select">
-                        <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                        <option value="A" {% if selected_division == 'A' %}selected{% endif %}>A</option>
+                        <option value="B" {% if selected_division == 'B' %}selected{% endif %}>B</option>
+                        <option value="C" {% if selected_division == 'C' %}selected{% endif %}>C</option>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Period</label>
                     <select name="period" class="form-select">
-                        {% for i in "123456" %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
+                        {% for i in "123456" %}
+                        <option value="{{ i }}" {% if selected_period|stringformat:"s" == i %}selected{% endif %}>{{ i }}</option>
+                        {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-3 d-flex align-items-end">
@@ -47,7 +51,9 @@
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="subject" value="{{ selected_subject.pk }}">
-            <input type="hidden" name="date" value="{{ today }}">
+            <input type="hidden" name="date" value="{{ selected_date }}">
+            <input type="hidden" name="division" value="{{ selected_division }}">
+            <input type="hidden" name="period" value="{{ selected_period }}">
             <div class="table-responsive">
                 <table class="erp-table">
                     <thead><tr><th>Enrollment</th><th>Name</th><th>Present</th><th>Absent</th><th>Late</th></tr></thead>
@@ -56,9 +62,9 @@
                         <tr>
                             <td style="font-weight:600;color:var(--accent-blue);">{{ s.enrollment_no }}</td>
                             <td>{{ s.user.get_full_name }}</td>
-                            <td><input type="radio" name="status_{{ s.pk }}" value="present" checked></td>
-                            <td><input type="radio" name="status_{{ s.pk }}" value="absent"></td>
-                            <td><input type="radio" name="status_{{ s.pk }}" value="late"></td>
+                            <td><input type="radio" name="status_{{ s.pk }}" value="present" {% if s.current_status == 'present' or not s.current_status %}checked{% endif %}></td>
+                            <td><input type="radio" name="status_{{ s.pk }}" value="absent" {% if s.current_status == 'absent' %}checked{% endif %}></td>
+                            <td><input type="radio" name="status_{{ s.pk }}" value="late" {% if s.current_status == 'late' %}checked{% endif %}></td>
                         </tr>
                         {% endfor %}
                     </tbody>

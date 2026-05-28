@@ -5,15 +5,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        surface: '#050714',
-        panel: 'rgba(8, 16, 34, 0.88)',
-        border: 'rgba(255, 255, 255, 0.1)',
-        accent: '#61dafb',
-        muted: '#8a99b8',
-        highlight: '#7c3aed',
+        surface: '#051617',
+        panel: 'rgba(10, 34, 30, 0.94)',
+        border: 'rgba(255, 255, 255, 0.08)',
+        accent: '#14b8a6',
+        muted: '#a3b8a0',
+        highlight: '#fae8c4',
+        surfaceLight: '#0d2d27',
       },
       boxShadow: {
-        glass: '0 20px 60px rgba(0, 0, 0, 0.28)',
+        glass: '0 24px 80px rgba(0, 0, 0, 0.32)',
       },
     },
   },

@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+{% block title %}Leave Policies — CampusPro{% endblock %}
+{% block page_title %}Leave Policies{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card mb-4">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+            <div>
+                <h5 class="mb-1"><i class="fas fa-cog me-2 text-accent-blue"></i>Leave Policy Management</h5>
+                <p class="text-muted mb-0" style="font-size: 13px;">Manage leave categories and set maximum annual limits for staff members.</p>
+            </div>
+            <a href="{% url 'leave_type_create' %}" class="btn-primary-erp"><i class="fas fa-plus me-1"></i> Add Policy</a>
+        </div>
+    </div>
+
+    <div class="erp-card">
+        <div class="table-responsive">
+            <table class="erp-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Leave Type Name</th>
+                        <th>Max Days Per Year</th>
+                        <th>Policy Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lt in leave_types %}
+                    <tr>
+                        <td style="font-weight:600;color:var(--text-primary);">{{ lt.name }}</td>
+                        <td><span style="font-weight:600;color:var(--accent-blue);">{{ lt.max_days_per_year }} days</span></td>
+                        <td>
+                            {% if lt.is_active %}
+                                <span class="badge-status approved" style="font-size: 11px;"><i class="fas fa-check-circle me-1"></i> Active Policy</span>
+                            {% else %}
+                                <span class="badge-status rejected" style="font-size: 11px;"><i class="fas fa-ban me-1"></i> Disabled</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'leave_type_edit' lt.pk %}" class="btn-outline-erp btn-sm" style="display: inline-block; padding: 4px 8px;"><i class="fas fa-edit"></i> Edit</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center" style="padding:24px;color:var(--text-muted);">No leave policies configured.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

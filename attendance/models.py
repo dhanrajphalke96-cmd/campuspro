@@ -79,3 +79,47 @@ class AttendanceAlert(models.Model):
 
     def __str__(self):
         return f"Alert: {self.student.enrollment_no} - {self.subject.code} ({self.percentage}%)"
+
+
+class Timetable(models.Model):
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ]
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='timetables')
+    semester = models.IntegerField()
+    division = models.CharField(max_length=5, default='A')
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='draft')
+    created_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='created_timetables')
+    approved_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_timetables')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['department', 'semester', 'division']
+
+    def __str__(self):
+        return f"Timetable - {self.department.code} Sem {self.semester} Div {self.division}"
+
+
+class TimetableEntry(models.Model):
+    DAY_CHOICES = [
+        (1, 'Monday'), (2, 'Tuesday'), (3, 'Wednesday'),
+        (4, 'Thursday'), (5, 'Friday'), (6, 'Saturday')
+    ]
+    timetable = models.ForeignKey(Timetable, on_delete=models.CASCADE, related_name='entries')
+    day_of_week = models.IntegerField(choices=DAY_CHOICES)
+    period = models.IntegerField()
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    faculty = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, limit_choices_to={'role': 'faculty'})
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    class Meta:
+        ordering = ['day_of_week', 'period']
+
+    def __str__(self):
+        return f"{self.timetable} - Day {self.day_of_week} Period {self.period}"
+

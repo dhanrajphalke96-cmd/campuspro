@@ -1,0 +1,165 @@
+{% extends 'core/base.html' %}
+{% block title %}Record Staff Attendance — CampusPro{% endblock %}
+{% block page_title %}Record Staff Attendance{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="erp-card mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h5 class="mb-1"><i class="fas fa-calendar-check me-2 text-accent-green"></i>Daily Attendance Sheet</h5>
+                <p class="text-muted mb-0" style="font-size: 13px;">Select a date to record or update attendance for all active staff members.</p>
+            </div>
+            
+            <form method="get" class="d-flex align-items-center gap-2" id="date-select-form">
+                <label class="form-label mb-0 text-nowrap" style="font-size:14px;font-weight:500;">Select Date:</label>
+                <input type="date" name="date" class="form-control" value="{{ selected_date|date:'Y-m-d' }}" onchange="document.getElementById('date-select-form').submit();" style="width: 160px; background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-color);">
+            </form>
+        </div>
+    </div>
+
+    <form method="post" id="attendance-form">
+        {% csrf_token %}
+        <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+        
+        <div class="erp-card">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+                <h6 class="mb-0 text-accent-blue" style="font-weight:600;">Staff Roll Call - {{ selected_date|date:"d M Y" }}</h6>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn-outline-erp btn-sm" onclick="quickFill('present')"><i class="fas fa-check-double text-accent-green"></i> All Present</button>
+                    <button type="button" class="btn-outline-erp btn-sm" onclick="quickFill('absent')"><i class="fas fa-times-circle text-accent-red"></i> All Absent</button>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="erp-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Emp ID</th>
+                            <th>Staff Name</th>
+                            <th>Department</th>
+                            <th>Designation</th>
+                            <th class="text-center" style="width: 320px;">Attendance Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in staff_data %}
+                        <tr>
+                            <td style="font-weight:600;color:var(--accent-blue);">{{ s.profile.employee_id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--gradient-blue); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">
+                                        {% if s.profile.user.first_name %}{{ s.profile.user.first_name.0 }}{% else %}{{ s.profile.user.username.0|upper }}{% endif %}
+                                    </div>
+                                    <span style="font-weight:500;color:var(--text-primary);">{{ s.profile.user.get_full_name }}</span>
+                                </div>
+                            </td>
+                            <td>{{ s.profile.department.name|default:"—" }}</td>
+                            <td><span class="badge-status info" style="font-size:11px;">{{ s.profile.get_designation_display }}</span></td>
+                            <td>
+                                {% if s.on_leave %}
+                                    <!-- Staff has an approved leave on this date -->
+                                    <div class="text-center">
+                                        <span class="badge-status orange" style="padding: 6px 12px; font-size: 12px; width: 100%; display: block;">
+                                            <i class="fas fa-plane-departure me-1"></i> Approved Leave
+                                        </span>
+                                        <input type="hidden" name="attendance_{{ s.profile.id }}" value="on_leave">
+                                    </div>
+                                {% else %}
+                                    <!-- Render radio selector -->
+                                    <div class="d-flex justify-content-between align-items-center p-1 rounded" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);">
+                                        <label class="btn-radio-container flex-fill text-center mb-0">
+                                            <input type="radio" name="attendance_{{ s.profile.id }}" value="present" 
+                                                {% if s.status == 'present' %}checked{% endif %}>
+                                            <span class="btn-radio-label present">P</span>
+                                        </label>
+                                        <label class="btn-radio-container flex-fill text-center mb-0">
+                                            <input type="radio" name="attendance_{{ s.profile.id }}" value="absent"
+                                                {% if s.status == 'absent' %}checked{% endif %}>
+                                            <span class="btn-radio-label absent">A</span>
+                                        </label>
+                                        <label class="btn-radio-container flex-fill text-center mb-0">
+                                            <input type="radio" name="attendance_{{ s.profile.id }}" value="half_day"
+                                                {% if s.status == 'half_day' %}checked{% endif %}>
+                                            <span class="btn-radio-label half">H</span>
+                                        </label>
+                                        <label class="btn-radio-container flex-fill text-center mb-0">
+                                            <input type="radio" name="attendance_{{ s.profile.id }}" value="on_leave"
+                                                {% if s.status == 'on_leave' %}checked{% endif %}>
+                                            <span class="btn-radio-label leave">L</span>
+                                        </label>
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center" style="padding:24px;color:var(--text-muted);">No active staff found to record attendance.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if staff_data %}
+            <div class="mt-3">
+                <button type="submit" class="btn-primary-erp" id="save-attendance-btn">
+                    <i class="fas fa-save me-2"></i> Save Attendance Sheet
+                </button>
+                <a href="{% url 'hrms_dashboard' %}" class="btn-outline-erp">Cancel</a>
+            </div>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<style>
+/* Modern premium radio controls inside attendance grid */
+.btn-radio-container {
+    cursor: pointer;
+    position: relative;
+}
+.btn-radio-container input[type="radio"] {
+    display: none;
+}
+.btn-radio-label {
+    display: block;
+    padding: 4px 0;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    color: var(--text-muted);
+}
+.btn-radio-container input[type="radio"]:checked + .btn-radio-label.present {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-green);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+}
+.btn-radio-container input[type="radio"]:checked + .btn-radio-label.absent {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--accent-red);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+}
+.btn-radio-container input[type="radio"]:checked + .btn-radio-label.half {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--accent-orange);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.1);
+}
+.btn-radio-container input[type="radio"]:checked + .btn-radio-label.leave {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--accent-blue);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+}
+.btn-radio-label:hover {
+    background: rgba(255,255,255,0.05);
+}
+</style>
+
+<script>
+function quickFill(status) {
+    const radios = document.querySelectorAll(`input[type="radio"][value="${status}"]`);
+    radios.forEach(radio => {
+        radio.checked = true;
+    });
+}
+</script>
+{% endblock %}
