@@ -50,9 +50,8 @@ def book_issue_create(request):
         issue = BookIssue.objects.create(
             book=book, student=student,
             due_date=timezone.now().date() + timedelta(days=due_days),
+            status='issued',
         )
-        book.available_copies -= 1
-        book.save()
         messages.success(request, f'Book issued to {student.user.get_full_name()}.')
         return redirect('book_issue_list')
 

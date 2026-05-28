@@ -142,9 +142,16 @@ def attendance_mark(request):
         if subject_id and date:
             selected_subject = Subject.objects.get(pk=subject_id)
             # Verify assignment
-            if request.user.role == 'faculty' and not selected_subject.assigned_faculty.filter(pk=request.user.pk).exists():
-                messages.error(request, "You are not assigned to teach this subject.")
-                return redirect('attendance_dashboard')
+            if request.user.role == 'faculty':
+                if not selected_subject.assigned_faculty.filter(pk=request.user.pk).exists():
+                    messages.error(request, "You are not assigned to teach this subject.")
+                    return redirect('attendance_dashboard')
+                session_faculty = request.user
+            else:
+                session_faculty = selected_subject.assigned_faculty.first()
+                if not session_faculty:
+                    messages.error(request, f"No faculty member is assigned to {selected_subject.name}. Please assign a faculty member first.")
+                    return redirect('attendance_dashboard')
 
             session, created = AttendanceSession.objects.get_or_create(
                 subject=selected_subject,
@@ -152,7 +159,7 @@ def attendance_mark(request):
                 period=int(period),
                 division=division,
                 defaults={
-                    'faculty': request.user,
+                    'faculty': session_faculty,
                     'semester': selected_subject.semester,
                 }
             )

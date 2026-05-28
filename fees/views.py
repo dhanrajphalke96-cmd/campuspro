@@ -11,13 +11,13 @@ from core.decorators import role_required
 @role_required('admin', 'principal', 'accountant', 'student')
 def fees_dashboard(request):
     if request.user.role == 'student':
-        if not hasattr(request.user, 'studentprofile'):
+        if not hasattr(request.user, 'student_profile'):
             messages.error(request, "Student profile not found.")
             return redirect('dashboard')
-        total_collected = FeePayment.objects.filter(student=request.user.studentprofile, status='paid').aggregate(total=Sum('amount_paid'))['total'] or 0
-        pending_count = FeePayment.objects.filter(student=request.user.studentprofile, status='pending').count()
-        paid_count = FeePayment.objects.filter(student=request.user.studentprofile, status='paid').count()
-        recent_payments = FeePayment.objects.filter(student=request.user.studentprofile).select_related('fee_structure').order_by('-created_at')[:10]
+        total_collected = FeePayment.objects.filter(student=request.user.student_profile, status='paid').aggregate(total=Sum('amount_paid'))['total'] or 0
+        pending_count = FeePayment.objects.filter(student=request.user.student_profile, status='pending').count()
+        paid_count = FeePayment.objects.filter(student=request.user.student_profile, status='paid').count()
+        recent_payments = FeePayment.objects.filter(student=request.user.student_profile).select_related('fee_structure').order_by('-created_at')[:10]
         fee_structures = FeeStructure.objects.none() # Students don't manage structures
     else:
         total_collected = FeePayment.objects.filter(status='paid').aggregate(total=Sum('amount_paid'))['total'] or 0

@@ -15,11 +15,11 @@ inactive_courses = Course.objects.filter(is_active=False).annotate(
 )
 
 if not inactive_courses.exists():
-    print("✓ No inactive courses - database is clean!\n")
+    print("[OK] No inactive courses - database is clean!\n")
 else:
     print(f"Found {inactive_courses.count()} inactive courses:\n")
     for course in inactive_courses:
-        print(f"✗ {course.name} ({course.code})")
+        print(f"[X] {course.name} ({course.code})")
         print(f"  Department: {course.department.name} ({course.department.code})")
         print(f"  Students still enrolled: {course.student_count}")
         
@@ -35,4 +35,5 @@ active_courses = Course.objects.filter(is_active=True).annotate(
 )
 
 for course in active_courses:
-    print(f"✓ {course.name} ({course.code}) - {course.student_count} students")
+    print(f"[OK] {course.name} ({course.code}) - {course.student_count} students")
+
